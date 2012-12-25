@@ -188,7 +188,7 @@ bool Region::load()
    fclose(fh);
    fh = 0;
 
-	printf("region: loaded %li chunks\n", this->data.size());
+	printf("region: loaded %li chunks from %s\n", this->data.size(), file_path.c_str());
 	
 	return true;
 }
