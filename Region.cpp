@@ -204,7 +204,8 @@ void Region::unload()
 }
 
 
-
+// save: a chunk's header data is in a position in the header relative to its x/z coords.
+// 4 * ((x mod 32) + (z mod 32) * 32)
 
 
 
