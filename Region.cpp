@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <algorithm>
 
+#include "NBT_File.h"
+#include "NBT_Debug.h"
 #include "Region.h"
 #include "Chunk.h"
 #include "Util.h"
@@ -93,36 +95,31 @@ bool Region::load()
 		return false;
 	}
 	
-	fh = fopen(file_path.c_str(), "r");
-	if(!fh)
+	fh = new NBT_File(file_path);
+
+	if(fh->open()))
 	{
 		fprintf(stderr, "failed to open chunk file: %s: %s\n", file_path.c_str(), strerror(errno));
 		return false;
 	}
 	
-	fseek(fh, 0, SEEK_END);
-	int file_length = ftell(fh);
-	fseek(fh, 0, SEEK_SET);
+	fh->fseek(0, SEEK_END);
+	int file_length = fh->tell();
+	fh->seek(0, SEEK_SET);
 	
 	printf("region file length: %i bytes\n", file_length);
-	
-	uint32_t header[SECTOR_SIZE / 2];
-	memset(header, 0, sizeof(header));
-	
-	int header_read_bytes = fread(header, 1, sizeof(header), fh);
-	if(header_read_bytes != sizeof(header))
-	{
-		fprintf(stderr, "failed to read header from: %s: %s\n", file_path.c_str(), strerror(errno));
-		fprintf(stderr, "got %i bytes, wanted %li\n", header_read_bytes, sizeof(header));
-		fclose(fh);
-		return false;
-	}
 	
 	std::vector<Chunk *> temp_list;
 	
 	for(int i = 0; i < SECTOR_SIZE/4; i++)
 	{
-		uint32_t loc = swap_uint32(header[i]);
+		uint32_t loc = 0;
+		if(!fh->read(&loc))
+		{
+			NBT_Debug("failed to read chunk %i location", i);
+			fh->close();
+			return false;
+		}
 		
 		uint32_t offset = loc >> 8;
 		uint8_t len = loc & 0xff;//(loc >> 24) & 0xff;
@@ -134,11 +131,22 @@ bool Region::load()
 			continue;
 		}
 		
-		uint32_t timestamp = swap_uint32(header[i+(SECTOR_SIZE/4)]);
-		
-		Chunk *chunk = new Chunk(timestamp, offset, len);
+		Chunk *chunk = new Chunk(0, offset, len);
 		temp_list.push_back(chunk);
+	}
+	
+	for(int i = 0; i < SECTOR_SIZE/4; i++)
+	{
+		uint32_t timestamp = 0;
 		
+		if(!fh->read(&timestamp))
+		{
+			NBT_Debug("failed to read chunk %i timestamp", i);
+			fh->close();
+			return false;
+		}
+		
+		temp_list[i].setTimestamp(timestamp);
 	}
 	
 	std::sort(temp_list.begin(), temp_list.end(), &chunk_timestamp_compare);
@@ -149,33 +157,15 @@ bool Region::load()
 	{
 		Chunk *chunk = *chunk_iterator;
 		
-      uint8_t *chunk_data = (uint8_t *)malloc(chunk->len() * SECTOR_SIZE);
-		if(!chunk_data)
+		if(!fh->seek(chunk->offset() * SECTOR_SIZE, SEEK_SET))
 		{
-			fprintf(stderr, "ERROR: failed to allocate memory for chunk.\n");
-			continue;
+			break;
 		}
 		
-		//printf("seek to sector %i (%i bytes)\n", chunk->offset(), chunk->offset() * SECTOR_SIZE);
-		if(fseek(fh, chunk->offset() * SECTOR_SIZE, SEEK_SET) != 0)
-		{
-			fprintf(stderr, "WARN: failed to seek to start of chunk %i at %i\n", chunk->offset(), chunk->offset() * SECTOR_SIZE);
-			continue;
-		}
-		
-		uint32_t read_bytes = fread(chunk_data, 1, chunk->len() * SECTOR_SIZE, fh);
-		if(read_bytes != chunk->len() * SECTOR_SIZE)
-		{
-			fprintf(stderr, "WARN: failed to read %i bytes (got: %i) from file.\n", chunk->len() * SECTOR_SIZE, read_bytes);
-			fprintf(stderr, "%s\n", strerror(ferror(fh)));
-			continue;
-		}
-		
-		if(!chunk->load(chunk_data))
+		if(!chunk->load(fh))
 		{
 			delete chunk;
 			break;
-			continue;
 		}
 		
       delete chunk_data;
@@ -185,7 +175,7 @@ bool Region::load()
 		//printf("chunk offset at %i 4k sectors %i sectors long\n", offset, len);
 	}
 	
-   fclose(fh);
+   fh->close();
    fh = 0;
 
 	printf("region: loaded %li chunks from %s\n", this->data.size(), file_path.c_str());

@@ -6,6 +6,7 @@
 #include <cstdio>
 
 class Chunk;
+class NBT_File;
 
 #define SECTOR_SIZE 4096
 
@@ -34,7 +35,7 @@ class Region
 		bool file_exists;
 		bool old_format;
 		std::string file_path;
-		FILE *fh;
+		NBT_File *fh;
 		
 		std::vector <Chunk *> data;
 };

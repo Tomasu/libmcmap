@@ -4,6 +4,7 @@
 #include <cstdint>
 
 class NBT;
+class NBT_File;
 
 class Chunk
 {
@@ -11,10 +12,13 @@ class Chunk
 		Chunk(int t, int co, int cl);
 		~Chunk();
 		
-		bool load(void *data);
+		bool load(NBT_File *fh);
+		bool save(NBT_File *buff);
 		
 		int x() { return x_pos; }
 		int z() { return z_pos; }
+		
+		void setTimestamp(uint32_t timestamp) { this->timestamp = timestamp; }
 		int getTimestamp() { return timestamp; }
 		
 		uint32_t offset() { return chunk_offset; }
