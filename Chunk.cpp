@@ -28,8 +28,10 @@ Chunk::~Chunk()
 #define DEST_BUFFER_SIZE (SECTOR_SIZE * 8)
 bool Chunk::load(NBT_File *fh)
 {
-	uint32_t length = swap_uint32(*((uint32_t *)data));
-	uint8_t compression_type = ((uint8_t *)data)[4];
+	uint32_t length = 0;
+	uint8_t compression_type = 0;
+	
+	//NBT_Debug("begin");
 	
 	if(!fh->read(&length))
 	{
@@ -43,7 +45,7 @@ bool Chunk::load(NBT_File *fh)
 		return false;
 	}
 	
-	//printf("chunk offset: %i, length: %i sectors, %i bytes, type: %s\n", chunk_offset, chunk_len, length, compression_type == 1 ? "GZip" : "Zlib");
+	//NBT_Debug("chunk offset: %i, length: %i sectors, %i bytes, type: %s\n", chunk_offset, chunk_len, length, compression_type == 1 ? "GZip" : "Zlib");
 	
 	if(compression_type == 1)
 	{
@@ -51,11 +53,25 @@ bool Chunk::load(NBT_File *fh)
 		return false;
 	}
 	
+	if(!fh->readCompressedMode(length))
+	{
+		NBT_Error("failed to enter compressed mode");
+		return false;
+	}
 	
-	nbt_data = new NBT();
-	bool load_ret = nbt_data->decode(dest_buffer, dest_buffer_pos);
+	nbt_data = (NBT_Tag_Compound *)nbt_data->readTag(fh);
+	if(!nbt_data)
+	{
+		NBT_Error("failed to load root tag");
+	}
 	
-	free(dest_buffer);
+	if(!fh->endCompressedMode())
+	{
+		NBT_Error("failed to end compressed mode");
+		return false;
+	}
 	
-	return load_ret;
+	//NBT_Debug("end");
+	
+	return nbt_data != 0;
 }

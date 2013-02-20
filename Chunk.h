@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-class NBT;
+class NBT_Tag_Compound;
 class NBT_File;
 
 class Chunk
@@ -24,7 +24,7 @@ class Chunk
 		uint32_t offset() { return chunk_offset; }
 		uint32_t len() { return chunk_len; }
 
-      NBT *nbt() { return nbt_data; }
+      NBT_Tag_Compound *nbt() { return nbt_data; }
 
 	private:
 		int x_pos;
@@ -34,7 +34,7 @@ class Chunk
 		uint32_t chunk_offset;
 		uint32_t chunk_len;
 		
-      NBT *nbt_data;
+      NBT_Tag_Compound *nbt_data;
 };
 
 #endif /* CHUNK_H_GUARD */

@@ -12,7 +12,7 @@
 
 Region::Region(int x, int z) : x_pos(x), z_pos(z), file_exists(false), old_format(false)
 {
-	
+	fh = 0;
 }
 
 Region::Region(const std::string &path) : x_pos(0), z_pos(0), file_exists(false), old_format(false)
@@ -59,12 +59,13 @@ Region::Region(const std::string &path) : x_pos(0), z_pos(0), file_exists(false)
 	
 	file_exists = true;
 	file_path = path;
+	fh = 0;
 }
 
 Region::~Region()
 {
    if(fh)
-      fclose(fh);
+      delete fh;
 
    fh = 0;
 
@@ -97,13 +98,13 @@ bool Region::load()
 	
 	fh = new NBT_File(file_path);
 
-	if(fh->open()))
+	if(!fh->open())
 	{
 		fprintf(stderr, "failed to open chunk file: %s: %s\n", file_path.c_str(), strerror(errno));
 		return false;
 	}
 	
-	fh->fseek(0, SEEK_END);
+	fh->seek(0, SEEK_END);
 	int file_length = fh->tell();
 	fh->seek(0, SEEK_SET);
 	
@@ -127,7 +128,7 @@ bool Region::load()
 		if(!offset || !len)
 		{
 			// missing chunk
-			//fprintf(stderr, "chunk empty %i %i!\n", offset, len);
+			//fprintf(stderr, "chunk empty %i %i (%08x)!\n", offset, len, loc);
 			continue;
 		}
 		
@@ -135,7 +136,7 @@ bool Region::load()
 		temp_list.push_back(chunk);
 	}
 	
-	for(int i = 0; i < SECTOR_SIZE/4; i++)
+	for(uint32_t i = 0; i < temp_list.size(); i++)
 	{
 		uint32_t timestamp = 0;
 		
@@ -146,37 +147,41 @@ bool Region::load()
 			return false;
 		}
 		
-		temp_list[i].setTimestamp(timestamp);
+		temp_list[i]->setTimestamp(timestamp);
 	}
 	
 	std::sort(temp_list.begin(), temp_list.end(), &chunk_timestamp_compare);
 	
 	std::vector<Chunk *>::iterator chunk_iterator;
 	
+	int chunk_idx = 0;
 	for(chunk_iterator = temp_list.begin(); chunk_iterator != temp_list.end(); chunk_iterator++)
 	{
 		Chunk *chunk = *chunk_iterator;
 		
 		if(!fh->seek(chunk->offset() * SECTOR_SIZE, SEEK_SET))
 		{
+			NBT_Error("failed to seek to chunk offset");
 			break;
 		}
 		
+		//NBT_Debug("load chunk %i", chunk_idx);
+		chunk_idx++;
 		if(!chunk->load(fh))
 		{
+			NBT_Error("failed to load chunk");
 			delete chunk;
+			return false;
 			break;
 		}
-		
-      delete chunk_data;
 
 		this->data.push_back(chunk);
 		
 		//printf("chunk offset at %i 4k sectors %i sectors long\n", offset, len);
 	}
 	
-   fh->close();
-   fh = 0;
+   delete fh;
+	fh = 0;
 
 	printf("region: loaded %li chunks from %s\n", this->data.size(), file_path.c_str());
 	
@@ -191,6 +196,11 @@ void Region::unload()
    }
 
    data.clear();
+	
+	if(fh)
+		delete fh;
+	
+	fh = 0;
 }
 
 
