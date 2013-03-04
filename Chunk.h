@@ -9,7 +9,7 @@ class NBT_File;
 class Chunk
 {
 	public:
-		Chunk(int t, int co, int cl);
+		Chunk(int t, int x, int z, int co, int cl);
 		~Chunk();
 		
 		bool load(NBT_File *fh);
@@ -26,6 +26,8 @@ class Chunk
 
       NBT_Tag_Compound *nbt() { return nbt_data; }
 
+      void setIdx(uint32_t idx) { this->idx = idx; }
+      uint32_t getIdx() { return idx; }
 	private:
 		int x_pos;
 		int z_pos;
@@ -35,6 +37,8 @@ class Chunk
 		uint32_t chunk_len;
 		
       NBT_Tag_Compound *nbt_data;
+		
+		uint32_t idx;
 };
 
 #endif /* CHUNK_H_GUARD */

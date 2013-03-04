@@ -20,6 +20,9 @@ class Region
 		bool load();
       void unload();
 
+		bool save();
+		bool save(const std::string &file);
+		
       const std::string &filePath() { return file_path; }
 		int x() { return x_pos; }
 		int z() { return z_pos; }

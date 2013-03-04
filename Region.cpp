@@ -112,18 +112,27 @@ bool Region::load()
 	
 	std::vector<Chunk *> temp_list;
 	
-	for(int i = 0; i < SECTOR_SIZE/4; i++)
+	uint32_t loc_header[1024];
+	uint32_t ts_header[1024];
+	
+	if(!fh->read(loc_header, 1024))
 	{
-		uint32_t loc = 0;
-		if(!fh->read(&loc))
-		{
-			NBT_Debug("failed to read chunk %i location", i);
-			fh->close();
-			return false;
-		}
-		
-		uint32_t offset = loc >> 8;
-		uint8_t len = loc & 0xff;//(loc >> 24) & 0xff;
+		NBT_Error("failed to read chunk location header");
+		fh->close();
+		return false;
+	}
+	
+	if(!fh->read(ts_header, 1024))
+	{
+		NBT_Error("failed to read chunk timestamp header");
+		fh->close();
+		return false;
+	}
+	
+	for(int i = 0; i < 1024; i++)
+	{
+		uint32_t offset = loc_header[i] >> 8;
+		uint8_t len = loc_header[i] & 0xff;//(loc >> 24) & 0xff;
 		
 		if(!offset || !len)
 		{
@@ -132,41 +141,36 @@ bool Region::load()
 			continue;
 		}
 		
-		Chunk *chunk = new Chunk(0, offset, len);
+		uint32_t x = i % 32;
+		uint32_t z = i / 32;
+		
+		Chunk *chunk = new Chunk(ts_header[i], x, z, offset, len);
+		NBT_Debug("new chunk: i:%i offset:%i %i len:%i x:%i z:%i idx:%i", i, offset, chunk->offset(), len, x, z, x + z * 32);
+		chunk->setIdx(i);
+		
 		temp_list.push_back(chunk);
 	}
 	
-	for(uint32_t i = 0; i < temp_list.size(); i++)
-	{
-		uint32_t timestamp = 0;
-		
-		if(!fh->read(&timestamp))
-		{
-			NBT_Debug("failed to read chunk %i timestamp", i);
-			fh->close();
-			return false;
-		}
-		
-		temp_list[i]->setTimestamp(timestamp);
-	}
+	//std::sort(temp_list.begin(), temp_list.end(), &chunk_timestamp_compare);
 	
-	std::sort(temp_list.begin(), temp_list.end(), &chunk_timestamp_compare);
-	
+	NBT_Debug("got %i chunks", temp_list.size());
 	std::vector<Chunk *>::iterator chunk_iterator;
 	
-	int chunk_idx = 0;
+	int i = 0;
 	for(chunk_iterator = temp_list.begin(); chunk_iterator != temp_list.end(); chunk_iterator++)
 	{
 		Chunk *chunk = *chunk_iterator;
 		
+		NBT_Debug("chunk[%i]: offset:%i len:%i x:%i z:%i", chunk->getIdx(), chunk->offset(), chunk->len(), chunk->x(), chunk->z());
+			
 		if(!fh->seek(chunk->offset() * SECTOR_SIZE, SEEK_SET))
 		{
 			NBT_Error("failed to seek to chunk offset");
 			break;
 		}
 		
-		//NBT_Debug("load chunk %i", chunk_idx);
-		chunk_idx++;
+		//NBT_Debug("load chunk %i", i);
+		i++;
 		if(!chunk->load(fh))
 		{
 			NBT_Error("failed to load chunk");
@@ -175,6 +179,12 @@ bool Region::load()
 			break;
 		}
 
+		uint32_t x = chunk->x();
+		uint32_t z = chunk->z();
+
+		uint32_t chunk_idx = (x + z * 32);
+		NBT_Debug("chunk[%i]: %i (%ix%i)\n", chunk->getIdx(), chunk_idx, chunk->x(), chunk->z());
+		
 		this->data.push_back(chunk);
 		
 		//printf("chunk offset at %i 4k sectors %i sectors long\n", offset, len);
@@ -207,6 +217,86 @@ void Region::unload()
 // save: a chunk's header data is in a position in the header relative to its x/z coords.
 // 4 * ((x mod 32) + (z mod 32) * 32)
 
+bool Region::save()
+{
+	return save(file_path);
+}
 
+bool Region::save(const std::string &file_name)
+{
+	bool ret = true;
+	
+	if(fh)
+	{
+		NBT_Error("region file already open?");
+		return false;
+	}
+	
+	fh = new NBT_File(file_name, false); // open for writing
+	if(!fh->open())
+	{
+		NBT_Error("failed to open region file :(");
+		return false;
+	}
+	
+	uint32_t chunk_locs[1024];
+	uint32_t chunk_timestamps[1024];
+	
+	memset(chunk_locs, 0, sizeof(chunk_locs));
+	memset(chunk_timestamps, 0, sizeof(chunk_timestamps));
+	
+	uint32_t chunk_idx = 0;
+	for(auto &chunk: data)
+	{
+		uint32_t loc = 0;
+		
+		uint32_t sector_loc = chunk->offset();
+		
+		if(!fh->seek(sector_loc * SECTOR_SIZE))
+		{
+			NBT_Error("failed to seek to chunk location");
+			ret = false;
+			goto out;
+		}
+		
+		if(!chunk->save(fh))
+		{
+			NBT_Error("failed to save chunk");
+			ret = false;
+			goto out;
+		}
+		
+		uint32_t sector_count = ceil((double)chunk->len() / (double)SECTOR_SIZE);
+		
+		NBT_Debug("sector_loc: %i, sector_count: %i", sector_loc, sector_count);
+		loc = (sector_loc << 8) | (sector_count & 0xff);
+		
+		int x = chunk->x() % 32;
+		int z = chunk->z() % 32;
+		if(chunk->x() < 0)
+			x = 31 - -x;
+		if(chunk->z() < 0)
+			z = 31 - -z;
+		
+		chunk_idx = (x + z * 32);
+		NBT_Debug("x: %i/%i, z: %i/%i, chunk_idx: %i/%i", x, chunk->x(), z, chunk->z(), chunk->getIdx(), chunk_idx);
+		chunk_locs[chunk_idx] = loc;
+		chunk_timestamps[chunk_idx] = chunk->getTimestamp();
+//		chunk_idx++;
+	}
+	
+	fh->seek(0);
+	
+	NBT_Debug("writing headers: %i bytes", sizeof(chunk_locs)+sizeof(chunk_timestamps));
+	fh->write(chunk_locs, 1024);
+	fh->write(chunk_timestamps, 1024);
+	
+out:
+	fh->close();
+	delete fh;
+	fh = 0;
+
+	return ret;
+}
 
 

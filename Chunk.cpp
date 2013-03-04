@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cassert>
+#include <cmath>
 #include "Region.h"
 #include "Chunk.h"
 #include "Util.h"
@@ -10,7 +11,7 @@
 
 #include <zlib.h>
 
-Chunk::Chunk(int t, int co, int cl) : timestamp(t), chunk_offset(co), chunk_len(cl)
+Chunk::Chunk(int t, int x, int z, int co, int cl) : x_pos(x), z_pos(z), timestamp(t), chunk_offset(co), chunk_len(cl), nbt_data(0)
 {
 	
 }
@@ -23,15 +24,13 @@ Chunk::~Chunk()
 	 nbt_data = 0;
 }
 
-// TODO: move decompression code into NBT_Buffer
-
 #define DEST_BUFFER_SIZE (SECTOR_SIZE * 8)
 bool Chunk::load(NBT_File *fh)
 {
 	uint32_t length = 0;
 	uint8_t compression_type = 0;
 	
-	//NBT_Debug("begin");
+	NBT_Debug("begin");
 	
 	if(!fh->read(&length))
 	{
@@ -45,7 +44,8 @@ bool Chunk::load(NBT_File *fh)
 		return false;
 	}
 	
-	//NBT_Debug("chunk offset: %i, length: %i sectors, %i bytes, type: %s\n", chunk_offset, chunk_len, length, compression_type == 1 ? "GZip" : "Zlib");
+	uint32_t swapped = swap_uint32(length);
+	NBT_Debug("chunk offset: %i, length: %i sectors, %i bytes (%u), type: %s", chunk_offset, chunk_len, length, swapped, compression_type == 1 ? "GZip" : "Zlib");
 	
 	if(compression_type == 1)
 	{
@@ -53,7 +53,7 @@ bool Chunk::load(NBT_File *fh)
 		return false;
 	}
 	
-	if(!fh->readCompressedMode(length))
+	if(!fh->readCompressedMode(length-1))
 	{
 		NBT_Error("failed to enter compressed mode");
 		return false;
@@ -71,7 +71,36 @@ bool Chunk::load(NBT_File *fh)
 		return false;
 	}
 	
-	//NBT_Debug("end");
+	NBT_Debug("end");
 	
 	return nbt_data != 0;
 }
+
+bool Chunk::save(NBT_File *fh)
+{
+	if(!fh->writeCompressedMode())
+	{
+		NBT_Error("failed to enter compressed mode");
+		return false;
+	}
+	
+	if(!nbt_data->writeTag(fh))
+	{
+		NBT_Error("failed to write nbt tag");
+		fh->clearCompressedMode();
+		return false;
+	}
+	
+	chunk_len = ceil((double)fh->tell() / (double)SECTOR_SIZE);
+	
+	if(!fh->endCompressedMode())
+	{
+		NBT_Error("failed to end compressed mode");
+		fh->clearCompressedMode();
+		return false;
+	}
+	
+	return true;
+}
+
+
