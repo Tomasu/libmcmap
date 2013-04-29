@@ -10,6 +10,8 @@ endif(NOT ${ZLIB_LIBRARY})
 add_definitions(-fPIC ${NBT_CFLAGS})
 
 add_library(mcmap SHARED
+	Block.cpp
+	BlockMaps.cpp
 	Chunk.cpp
 	Map.cpp
 	Region.cpp

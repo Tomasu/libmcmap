@@ -3,7 +3,7 @@
 #include <cstring>
 #include <cassert>
 #include <cerrno>
-
+#include <sstream>
 #include <string>
 
 #include "Map.h"
@@ -26,10 +26,7 @@ Map::~Map()
 
 bool Map::load()
 {
-	std::string region_path = map_path;
-	region_path.append("/region");
-	
-	DIR *save_dir = opendir(region_path.c_str());
+	DIR *save_dir = opendir(map_path.c_str());
 	if(!save_dir)
 	{
 		fprintf(stderr, "failed to load map: %s\n", strerror(errno));
@@ -43,7 +40,7 @@ bool Map::load()
 		if(e->d_name[0] == '.')
 			continue;
 		
-		std::string ent_path = region_path;
+		std::string ent_path = map_path;
 		ent_path.append("/");
 		ent_path.append(e->d_name);
 		Region *new_region = new Region(ent_path);
@@ -52,6 +49,31 @@ bool Map::load()
 	}
 	
 	closedir(save_dir);
+	
+	return true;
+}
+
+bool Map::save()
+{
+	return saveTo(map_path);
+}
+
+bool Map::saveTo(const std::string &path)
+{
+	Region *region = firstRegion();
+	while(region != 0)
+	{
+		std::ostringstream fstr;
+		fstr << path << "/" << "r." << region->x() << "." << region->z() << ".mca";
+		std::string fpath = fstr.str();
+		
+		if(!region->save(fpath))
+		{
+			printf("failed to save region file: %s\n", fpath.c_str());
+		}
+		
+		region = nextRegion();
+	}
 	
 	return true;
 }

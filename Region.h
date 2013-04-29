@@ -32,6 +32,8 @@ class Region
 		
 		const std::vector <Chunk *> &chunks() { return data; }
 		
+		void deleteChunk(Chunk *chunk);
+		
 	private:
 		int x_pos;
 		int z_pos;

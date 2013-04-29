@@ -108,7 +108,7 @@ bool Region::load()
 	int file_length = fh->tell();
 	fh->seek(0, SEEK_SET);
 	
-	printf("region file length: %i bytes\n", file_length);
+	NBT_Debug("region file length: %i bytes\n", file_length);
 	
 	std::vector<Chunk *> temp_list;
 	
@@ -145,7 +145,7 @@ bool Region::load()
 		uint32_t z = i / 32;
 		
 		Chunk *chunk = new Chunk(ts_header[i], x, z, offset, len);
-		NBT_Debug("new chunk: i:%i offset:%i %i len:%i x:%i z:%i idx:%i", i, offset, chunk->offset(), len, x, z, x + z * 32);
+		//NBT_Debug("new chunk: i:%i offset:%i %i len:%i x:%i z:%i idx:%i", i, offset, chunk->offset(), len, x, z, x + z * 32);
 		chunk->setIdx(i);
 		
 		temp_list.push_back(chunk);
@@ -161,7 +161,7 @@ bool Region::load()
 	{
 		Chunk *chunk = *chunk_iterator;
 		
-		NBT_Debug("chunk[%i]: offset:%i len:%i x:%i z:%i", chunk->getIdx(), chunk->offset(), chunk->len(), chunk->x(), chunk->z());
+		//NBT_Debug("chunk[%i]: offset:%i len:%i x:%i z:%i", chunk->getIdx(), chunk->offset(), chunk->len(), chunk->x(), chunk->z());
 			
 		if(!fh->seek(chunk->offset() * SECTOR_SIZE, SEEK_SET))
 		{
@@ -183,7 +183,7 @@ bool Region::load()
 		uint32_t z = chunk->z();
 
 		uint32_t chunk_idx = (x + z * 32);
-		NBT_Debug("chunk[%i]: %i (%ix%i)\n", chunk->getIdx(), chunk_idx, chunk->x(), chunk->z());
+		//NBT_Debug("chunk[%i]: %i (%ix%i)\n", chunk->getIdx(), chunk_idx, chunk->x(), chunk->z());
 		
 		this->data.push_back(chunk);
 		
@@ -193,7 +193,7 @@ bool Region::load()
    delete fh;
 	fh = 0;
 
-	printf("region: loaded %li chunks from %s\n", this->data.size(), file_path.c_str());
+	//NBT_Debug("region: loaded %li chunks from %s\n", this->data.size(), file_path.c_str());
 	
 	return true;
 }
@@ -268,7 +268,7 @@ bool Region::save(const std::string &file_name)
 		
 		uint32_t sector_count = ceil((double)chunk->len() / (double)SECTOR_SIZE);
 		
-		NBT_Debug("sector_loc: %i, sector_count: %i", sector_loc, sector_count);
+		//NBT_Debug("sector_loc: %i, sector_count: %i", sector_loc, sector_count);
 		loc = (sector_loc << 8) | (sector_count & 0xff);
 		
 		int x = chunk->x() % 32;
@@ -279,7 +279,7 @@ bool Region::save(const std::string &file_name)
 			z = 31 - -z;
 		
 		chunk_idx = (x + z * 32);
-		NBT_Debug("x: %i/%i, z: %i/%i, chunk_idx: %i/%i", x, chunk->x(), z, chunk->z(), chunk->getIdx(), chunk_idx);
+		//NBT_Debug("x: %i/%i, z: %i/%i, chunk_idx: %i/%i", x, chunk->x(), z, chunk->z(), chunk->getIdx(), chunk_idx);
 		chunk_locs[chunk_idx] = loc;
 		chunk_timestamps[chunk_idx] = chunk->getTimestamp();
 //		chunk_idx++;
@@ -287,7 +287,7 @@ bool Region::save(const std::string &file_name)
 	
 	fh->seek(0);
 	
-	NBT_Debug("writing headers: %i bytes", sizeof(chunk_locs)+sizeof(chunk_timestamps));
+	//NBT_Debug("writing headers: %i bytes", sizeof(chunk_locs)+sizeof(chunk_timestamps));
 	fh->write(chunk_locs, 1024);
 	fh->write(chunk_timestamps, 1024);
 	
@@ -299,4 +299,9 @@ out:
 	return ret;
 }
 
+void Region::deleteChunk(Chunk *chunk)
+{
+	std::vector<Chunk *>::iterator it = find(data.begin(), data.end(), chunk);
+	data.erase(it);
+}
 

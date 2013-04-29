@@ -13,6 +13,8 @@ class Map
 		~Map();
 		
 		bool load();
+		bool save();
+		bool saveTo(const std::string &path);
 		
 		Region *firstRegion();
 		Region *nextRegion();

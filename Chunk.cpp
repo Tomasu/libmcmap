@@ -30,7 +30,7 @@ bool Chunk::load(NBT_File *fh)
 	uint32_t length = 0;
 	uint8_t compression_type = 0;
 	
-	NBT_Debug("begin");
+	//NBT_Debug("begin");
 	
 	if(!fh->read(&length))
 	{
@@ -45,7 +45,7 @@ bool Chunk::load(NBT_File *fh)
 	}
 	
 	uint32_t swapped = swap_uint32(length);
-	NBT_Debug("chunk offset: %i, length: %i sectors, %i bytes (%u), type: %s", chunk_offset, chunk_len, length, swapped, compression_type == 1 ? "GZip" : "Zlib");
+	//NBT_Debug("chunk offset: %i, length: %i sectors, %i bytes (%u), type: %s", chunk_offset, chunk_len, length, swapped, compression_type == 1 ? "GZip" : "Zlib");
 	
 	if(compression_type == 1)
 	{
@@ -71,7 +71,7 @@ bool Chunk::load(NBT_File *fh)
 		return false;
 	}
 	
-	NBT_Debug("end");
+	//NBT_Debug("end");
 	
 	return nbt_data != 0;
 }
