@@ -36,7 +36,7 @@ const char *BlockNames[BLOCK_COUNT] = {
 	"Dead Bush", // 32
 	"Piston Base", // 33
 	"Piston Extension", // 34
-	"Cloth", // 35
+	"Wool", // 35
 	"Piston Moving", // 36
 	"Yellow Plant", // 37
 	"Red Plant", // 38

@@ -228,6 +228,8 @@ sub build_block
 	my $name = shift;
 	my $arr = shift;
 	
+	$name = 'wool' if $name eq 'cloth';
+	
 	my %block = (
 		name => $name,
 		class => $arr->[0][0],
