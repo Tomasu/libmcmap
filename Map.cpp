@@ -34,6 +34,7 @@ bool Map::load()
 	}
 	
 	struct dirent *e;
+	//int limit = 0;
 	while((e = readdir(save_dir)))
 	{
 		// skip hidden files
@@ -46,6 +47,11 @@ bool Map::load()
 		Region *new_region = new Region(ent_path);
 		//printf("found region: %ix%i\n", new_region->x(), new_region->z());
 		data.push_back(new_region);
+		
+		//if(limit > 400)
+		//	break;
+		
+		//limit++;
 	}
 	
 	closedir(save_dir);

@@ -30,7 +30,9 @@ class Region
 		bool exists() { return file_exists; }
 		bool isOldFormat() { return old_format; }
 		
-		const std::vector <Chunk *> &chunks() { return data; }
+		std::vector <Chunk *> &chunks() { return data; }
+		uint32_t chunkCount() { return chunk_count; }
+		bool chunkExists(int x, int z);
 		
 		void deleteChunk(Chunk *chunk);
 		
@@ -39,6 +41,7 @@ class Region
 		int z_pos;
 		bool file_exists;
 		bool old_format;
+		uint32_t chunk_count;
 		std::string file_path;
 		NBT_File *fh;
 		

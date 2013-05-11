@@ -59,7 +59,7 @@ bool Chunk::load(NBT_File *fh)
 		return false;
 	}
 	
-	nbt_data = (NBT_Tag_Compound *)nbt_data->readTag(fh);
+	nbt_data = (NBT_Tag_Compound *)NBT_Tag::readTag(fh);
 	if(!nbt_data)
 	{
 		NBT_Error("failed to load root tag");
@@ -69,6 +69,19 @@ bool Chunk::load(NBT_File *fh)
 	{
 		NBT_Error("failed to end compressed mode");
 		return false;
+	}
+	
+	if(nbt_data)
+	{
+		NBT_Tag_Compound *level_tag = nbt_data->getCompound("Level");
+		if(!level_tag)
+		{
+			NBT_Error("chunk is missing Level tag");
+			return false;
+		}
+		
+		x_pos = level_tag->getInt("xPos");
+		z_pos = level_tag->getInt("zPos");
 	}
 	
 	//NBT_Debug("end");
@@ -84,6 +97,7 @@ bool Chunk::save(NBT_File *fh)
 		return false;
 	}
 	
+	uint32_t begin_pos = fh->tell();
 	if(!nbt_data->writeTag(fh))
 	{
 		NBT_Error("failed to write nbt tag");
@@ -91,14 +105,19 @@ bool Chunk::save(NBT_File *fh)
 		return false;
 	}
 	
-	chunk_len = ceil((double)fh->tell() / (double)SECTOR_SIZE);
-	
 	if(!fh->endCompressedMode())
 	{
 		NBT_Error("failed to end compressed mode");
 		fh->clearCompressedMode();
 		return false;
 	}
+
+	uint32_t end_pos = fh->tell();
+	
+	chunk_len = ceil((double)fh->lastWriteBufferLen() / (double)SECTOR_SIZE);
+	
+	//NBT_Debug("save chunk: begin_pos:%i, end_pos:%i, num chunks:%i (%i)", begin_pos, end_pos, chunk_len, fh->lastWriteBufferLen());
+	
 	
 	return true;
 }

@@ -175,6 +175,7 @@ sub load_blocks
 sub define_name
 {
 	my $name = ucfirst(shift);
+	$name =~ s/ //g;
 	
 	if($name =~ /Slab/)
 	{
