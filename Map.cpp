@@ -6,12 +6,21 @@
 #include <sstream>
 #include <string>
 
+#include "NBT_Debug.h"
+#include "NBT.h"
 #include "Map.h"
 #include "Region.h"
 
-Map::Map(const std::string &path) : map_path(path), iterator_pos(0)
+Map::Map(const std::string &path, const std::string &name, NBT *level_nbt) : map_path(path), map_name(name), iterator_pos(0), dimension_id(0), level_nbt(level_nbt)
 {
-	
+	size_t pos = map_name.find_first_of("-0123456789");
+	//NBT_Debug("pos: %i", pos);
+	if(pos != std::string::npos)
+	{
+		std::string num = map_name.substr(pos);
+		//NBT_Debug("num: %s", num.c_str());
+		dimension_id = strtol(num.c_str(), 0, 0);
+	}
 }
 
 Map::~Map()
@@ -95,8 +104,12 @@ Region *Map::nextRegion()
 	//assert((iterator_pos < data.size));
    if(iterator_pos >= data.size())
    {
-      printf("Map::nextRegion: iterator_pos == %i BAIL\n", iterator_pos);
+      //printf("Map::nextRegion: iterator_pos == %i BAIL\n", iterator_pos);
       return 0;
    }
 	return data[iterator_pos++];
 }
+
+int32_t Map::spawnX() { return level_nbt ? level_nbt->getInt("SpawnX") : 0; }
+int32_t Map::spawnZ() { return level_nbt ? level_nbt->getInt("SpawnZ") : 0; }
+int32_t Map::spawnY() { return level_nbt ? level_nbt->getInt("SpawnY") : 0; }

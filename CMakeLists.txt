@@ -13,7 +13,9 @@ add_library(mcmap SHARED
 	Block.cpp
 	BlockMaps.cpp
 	Chunk.cpp
+	Level.cpp
 	Map.cpp
+	Player.cpp
 	Region.cpp
 )
 

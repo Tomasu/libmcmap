@@ -171,6 +171,32 @@ bool Region::load()
 			break;
 		}
 		
+		// check to see if chunk is in the right location
+		int cx = chunk->x() % 32;
+		int cz = chunk->z() % 32;
+		
+		if(cx < 0)
+			cx = 32 - -cx;
+		if(cz < 0)
+			cz = 32 - -cz;
+		
+		int chunk_idx = (cx + cz * 32);
+		
+		if(i != chunk_idx)
+		{
+			NBT_Warn("chunk %ix%i in wrong location? expected %i got %i", chunk->x(), chunk->z(), i, chunk_idx);
+		}
+		
+		// check to see if chunk belongs in this region
+		int chunk_regionx = ceil((double)(chunk->x()+1) / 32.0 - 1);
+		int chunk_regionz = ceil((double)(chunk->z()+1) / 32.0 - 1);
+		
+		if(x_pos != chunk_regionx || z_pos != chunk_regionz)
+		{
+			NBT_Warn("chunk %ix%i in wrong region? expected %ix%i got %ix%i", x_pos, z_pos, chunk_regionx, chunk_regionz);
+		}
+//		NBT_Debug("region %ix%i: chunk[%i] %ix%i claims region %ix%i", x_pos, z_pos, i, chunk->x(), chunk->z(), chunk_regionx, chunk_regionz);
+		
 		chunk_count++;
 	}
 	

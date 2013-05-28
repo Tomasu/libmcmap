@@ -59,7 +59,7 @@ bool Chunk::load(NBT_File *fh)
 		return false;
 	}
 	
-	nbt_data = (NBT_Tag_Compound *)NBT_Tag::readTag(fh);
+	nbt_data = (NBT_Tag_Compound *)NBT_Tag::LoadTag(fh);
 	if(!nbt_data)
 	{
 		NBT_Error("failed to load root tag");
