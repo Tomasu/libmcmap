@@ -2,6 +2,7 @@
 #define CHUNK_H_GUARD
 
 #include <cstdint>
+#include <utility>
 
 class NBT_Tag_Compound;
 class NBT_File;
@@ -9,6 +10,8 @@ class NBT_File;
 class Chunk
 {
 	public:
+		typedef std::pair<int32_t, int32_t> Key;
+		
 		Chunk(int t, int x, int z, int co, int cl);
 		~Chunk();
 		
@@ -25,9 +28,10 @@ class Chunk
 		uint32_t len() { return chunk_len; }
 
       NBT_Tag_Compound *nbt() { return nbt_data; }
-
-      void setIdx(uint32_t idx) { this->idx = idx; }
-      uint32_t getIdx() { return idx; }
+      
+      const Key key() const { return Key(x_pos, z_pos); }
+      static const Key key(int32_t x, int32_t z) { return Key(x, z); }
+      
 	private:
 		int x_pos;
 		int z_pos;
@@ -37,8 +41,6 @@ class Chunk
 		uint32_t chunk_len;
 		
       NBT_Tag_Compound *nbt_data;
-		
-		uint32_t idx;
 };
 
 #endif /* CHUNK_H_GUARD */

@@ -362,7 +362,7 @@ const char *SubBlockNames[SUBBLOCKNAME_COUNT] = {
 	"Shrub", // 2:0
 	"Grass", // 2:1
 	"Fern", // 2:2
-	"Grass", // 2:3
+	"Shrub2", // 2:3
 	"Oak", // 5:0
 	"Spruce", // 5:1
 	"Birch", // 5:2
@@ -637,22 +637,22 @@ const char *SubBlockNames[SUBBLOCKNAME_COUNT] = {
 	"South", // 68:3
 	"West", // 68:4
 	"East", // 68:5
-	"East Off", // 69:0
+	"Ceiling East Off", // 69:0
 	"East Off", // 69:1
 	"West Off", // 69:2
 	"South Off", // 69:3
 	"North Off", // 69:4
-	"South Off", // 69:5
-	"East Off", // 69:6
-	"South Off", // 69:7
-	"East On", // 69:8
+	"Ground South Off", // 69:5
+	"Ground East Off", // 69:6
+	"Ceiling South Off", // 69:7
+	"Ceiling East On", // 69:8
 	"East On", // 69:9
 	"West On", // 69:10
 	"South On", // 69:11
 	"North On", // 69:12
-	"South On", // 69:13
-	"East On", // 69:14
-	"South On", // 69:15
+	"Ground South On", // 69:13
+	"Ground East On", // 69:14
+	"Ceiling South On", // 69:15
 	"", // 70:0
 	"Pressed", // 70:1
 	"Bottom West Closed", // 71:0

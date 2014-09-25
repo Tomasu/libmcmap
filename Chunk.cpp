@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cassert>
 #include <cmath>
-#include "Region.h"
+#include "MCRegion.h"
 #include "Chunk.h"
 #include "Util.h"
 
@@ -44,7 +44,6 @@ bool Chunk::load(NBT_File *fh)
 		return false;
 	}
 	
-	uint32_t swapped = swap_uint32(length);
 	//NBT_Debug("chunk offset: %i, length: %i sectors, %i bytes (%u), type: %s", chunk_offset, chunk_len, length, swapped, compression_type == 1 ? "GZip" : "Zlib");
 	
 	if(compression_type == 1)
@@ -97,7 +96,7 @@ bool Chunk::save(NBT_File *fh)
 		return false;
 	}
 	
-	uint32_t begin_pos = fh->tell();
+	//uint32_t begin_pos = fh->tell();
 	if(!nbt_data->writeTag(fh))
 	{
 		NBT_Error("failed to write nbt tag");
@@ -112,7 +111,7 @@ bool Chunk::save(NBT_File *fh)
 		return false;
 	}
 
-	uint32_t end_pos = fh->tell();
+	//uint32_t end_pos = fh->tell();
 	
 	chunk_len = ceil((double)fh->lastWriteBufferLen() / (double)SECTOR_SIZE);
 	

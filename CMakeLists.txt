@@ -16,7 +16,8 @@ add_library(mcmap SHARED
 	Level.cpp
 	Map.cpp
 	Player.cpp
-	Region.cpp
+	MCRegion.cpp
+	PairHash.cpp
 )
 
 add_dependencies(mcmap nbt)

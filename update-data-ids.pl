@@ -131,7 +131,7 @@ our %metadata = (
 		
 		return \@names;
 	})->(),
-	'grass' => [ 'Shrub', 'Grass', 'Fern', 'Grass' ],
+	'grass' => [ 'Shrub', 'Grass', 'Fern', 'Shrub2' ],
 	'yellow_flower' => [ 'Dandelion' ],
 	'red_flower' => [ 'Poppy', 'Blue Orchid', 'Allium', 'Azure Bluet', 'Red Tulip', 'White Tulip', 'Pink Tulip', 'Oxeye Daisy' ],
 	'double_plant' => (sub {
@@ -208,7 +208,7 @@ our %metadata = (
 	'dropper' => [ 'Down', 'Up', 'North', 'South', 'West', 'East' ],
 	'hopper' => [ 'Down', 'Up', 'North', 'South', 'West', 'East' ],
 	'lever' => (sub {
-		my @base_names = ( 'East', 'East', 'West', 'South', 'North', 'South', 'East', 'South' );
+		my @base_names = ( 'Ceiling East', 'East', 'West', 'South', 'North', 'Ground South', 'Ground East', 'Ceiling South' );
 		my @names;
 		
 		for(my $i = 0; $i < scalar @base_names; $i++)

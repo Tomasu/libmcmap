@@ -3,13 +3,16 @@
 
 #include <vector>
 #include <string>
+#include <unordered_map>
+#include "MCRegion.h"
 
-class Region;
 class NBT;
 
 class Map
 {	
 	public:
+		typedef std::unordered_map<typename MCRegion::Key, MCRegion *> RegionMap;
+		
 		Map(const std::string &path, const std::string &name, NBT *level_nbt);
 		~Map();
 		
@@ -17,10 +20,15 @@ class Map
 		bool save();
 		bool saveTo(const std::string &path);
 		
-		Region *firstRegion();
-		Region *nextRegion();
+		MCRegion *firstRegion();
+		MCRegion *nextRegion();
 		
 		int numRegions() { return data.size(); }
+		
+		MCRegion *getRegion(int32_t x, int32_t z);
+		MCRegion *getRegionForChunk(int32_t x, int32_t z);
+		
+		Chunk *getChunk(int32_t x, int32_t z);
 		
 		std::string mapPath() const { return map_path; }
 		std::string mapName() const { return map_name; }
@@ -36,11 +44,11 @@ class Map
 	private:
 		const std::string map_path;
 		std::string map_name;
-      uint32_t iterator_pos;
 		int32_t dimension_id;
 		NBT *level_nbt;
 		
-		std::vector< Region * > data;
+		RegionMap::iterator dataIterator_;
+		RegionMap data;
 };
 
 #endif /* MAP_H_GUARD */

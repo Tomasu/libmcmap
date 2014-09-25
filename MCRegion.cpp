@@ -6,16 +6,17 @@
 
 #include "NBT_File.h"
 #include "NBT_Debug.h"
-#include "Region.h"
+#include "MCRegion.h"
 #include "Chunk.h"
 #include "Util.h"
 
-Region::Region(int x, int z) : x_pos(x), z_pos(z), file_exists(false), old_format(false), chunk_count(0)
+
+MCRegion::MCRegion(int x, int z) : x_pos(x), z_pos(z), file_exists(false), old_format(false), chunk_count(0)
 {
 	fh = 0;
 }
 
-Region::Region(const std::string &path) : x_pos(0), z_pos(0), file_exists(false), old_format(false), chunk_count(0)
+MCRegion::MCRegion(const std::string &path) : x_pos(0), z_pos(0), file_exists(false), old_format(false), chunk_count(0)
 {
 	const char *c_path = path.c_str();
 	
@@ -57,12 +58,13 @@ Region::Region(const std::string &path) : x_pos(0), z_pos(0), file_exists(false)
 		ptr--;
 	}
 	
+	NBT_Debug("create region %ix%i %s", x_pos, z_pos, path.c_str());
 	file_exists = true;
 	file_path = path;
 	fh = 0;
 }
 
-Region::~Region()
+MCRegion::~MCRegion()
 {
    if(fh)
       delete fh;
@@ -71,7 +73,7 @@ Region::~Region()
 
    for(auto &chunk: data)
    {
-      delete chunk;
+      delete chunk.second;
    }
 
    data.clear();
@@ -82,7 +84,7 @@ static int chunk_timestamp_compare(Chunk *a, Chunk *b)
 	return a->offset() < b->offset();
 }
 
-bool Region::load()
+bool MCRegion::load()
 {
 	if(!file_exists)
 	{
@@ -96,8 +98,6 @@ bool Region::load()
 		return false;
 	}
 	
-	data.resize(1024, 0);
-	
 	NBT_Debug("load region %s", file_path.c_str());
 	fh = new NBT_File(file_path);
 
@@ -107,9 +107,9 @@ bool Region::load()
 		return false;
 	}
 	
-	fh->seek(0, SEEK_END);
-	int file_length = fh->tell();
-	fh->seek(0, SEEK_SET);
+	//fh->seek(0, SEEK_END);
+	//int file_length = fh->tell();
+	//fh->seek(0, SEEK_SET);
 	
 	//NBT_Debug("region file length: %i bytes", file_length);
 	
@@ -151,7 +151,6 @@ bool Region::load()
 		
 		Chunk *chunk = new Chunk(ts_header[i], 0xdeadbeef, 0xdeadbeef, offset, len);
 		//NBT_Debug("new chunk: i:%i offset:%i %i len:%i x:%i z:%i idx:%i", i, offset, chunk->offset(), len, x, z, x + z * 32);
-		chunk->setIdx(i);
 		
 		if(!fh->seek(chunk->offset() * SECTOR_SIZE, SEEK_SET))
 		{
@@ -160,16 +159,17 @@ bool Region::load()
 			break;
 		}
 		
-		data[i] = chunk;
-		
 		if(!chunk->load(fh))
 		{
 			NBT_Error("failed to load chunk");
-			data[i] = 0;
 			delete chunk;
 			ret = false;
 			break;
 		}
+		
+		//NBT_Debug("new chunk: i:%i offset:%i %i len:%i x:%i z:%i idx:%i", i, offset, chunk->offset(), len, x, z, x + z * 32);
+		
+		data.emplace(chunk->key(), chunk);
 		
 		// check to see if chunk is in the right location
 		int cx = chunk->x() % 32;
@@ -212,11 +212,11 @@ bool Region::load()
 	return ret;
 }
 
-void Region::unload()
+void MCRegion::unload()
 {
    for(auto &chunk: data)
    {
-      delete chunk;
+      delete chunk.second;
    }
 
    data.clear();
@@ -233,12 +233,12 @@ void Region::unload()
 // save: a chunk's header data is in a position in the header relative to its x/z coords.
 // 4 * ((x mod 32) + (z mod 32) * 32)
 
-bool Region::save()
+bool MCRegion::save()
 {
 	return save(file_path);
 }
 
-bool Region::save(const std::string &file_name)
+bool MCRegion::save(const std::string &file_name)
 {
 	bool ret = true;
 	
@@ -261,12 +261,17 @@ bool Region::save(const std::string &file_name)
 	memset(chunk_locs, 0, sizeof(chunk_locs));
 	memset(chunk_timestamps, 0, sizeof(chunk_timestamps));
 	
-	uint32_t chunk_idx = 0;
 	uint32_t chunk_off = 2;
 	
-	for(int i = 0; i < 1024; i++)
+	// TODO: think about sorting, or saving by x,z?
+	//  this seeks around quite a bit...
+	
+	uint32_t i = 0;
+	
+	for(auto &it: data)
 	{
-		Chunk *chunk = data[i];
+		Chunk *chunk = it.second;
+		
 		if(!chunk)
 			continue;
 		
@@ -280,7 +285,7 @@ bool Region::save(const std::string &file_name)
 		if(z < 0)
 			z = 31 - -z;
 		
-		chunk_idx = (x + z * 32);
+		//chunk_idx = (x + z * 32);
 
 		//NBT_Debug("%i/%i/%i %ix%i/%ix%i orig offset:%i new offset:%i", chunk->getIdx(), chunk_idx, i, chunk->x(), chunk->z(), x, z, chunk->offset(), chunk_off);
 		
@@ -306,7 +311,8 @@ bool Region::save(const std::string &file_name)
 		//NBT_Debug("x: %i/%i, z: %i/%i, chunk_idx: %i/%i", x, chunk->x(), z, chunk->z(), chunk->getIdx(), chunk_idx);
 		chunk_locs[i] = loc;
 		chunk_timestamps[i] = chunk->getTimestamp();
-//		chunk_idx++;
+		
+		i++;
 		
 		chunk_off += sector_count;
 	}
@@ -325,28 +331,74 @@ out:
 	return ret;
 }
 
-void Region::deleteChunk(Chunk *chunk)
+void MCRegion::deleteChunk(Chunk *chunk)
 {
-	data[chunk->getIdx()] = 0;
+	data.erase(chunk->key());
 	chunk_count--;
 }
 
-bool Region::chunkExists(int x, int z)
+bool MCRegion::chunkExists(int x, int z)
 {
-	x -= x_pos * 32;
-	z -= z_pos * 32;
-	
-	x %= 32;
-	z %= 32;
-
-	if(x < 0)
-		x = 31 - -x;
-	if(z < 0)
-		z = 31 - -z;
-		
-	int32_t chunk_idx = (x + z * 32);
-	if(chunk_idx < 0 || chunk_idx >= (int32_t)data.size())
+	if(data.count(Chunk::Key(x, z)) < 1)
 		return false;
 	
-	return data[chunk_idx] != 0;
+	auto it = data.find(Chunk::Key(x, z));
+	if(it == data.end() || it->second == nullptr)
+		return false;
+	
+	return true;
 }
+
+bool MCRegion::containsChunk(int32_t x, int32_t z)
+{
+	if((x >> 5) != x_pos)
+	{
+		NBT_File("x out of range: %i vs %i", x >> 5, x_pos);
+		return false;
+	}
+	
+	if((z >> 5) != z_pos)
+	{
+		NBT_File("z out of range: %i vs %i", z >> 5, z_pos);
+		return false;
+	}
+	
+	return true;
+}
+
+std::vector< Chunk* > MCRegion::chunks()
+{
+	std::vector<Chunk *> vec;
+	
+	for(auto &it: data)
+	{
+		vec.push_back(it.second);
+	}
+	
+	return vec;
+}
+
+Chunk* MCRegion::getChunkAbs(int32_t x, int32_t z)
+{
+	if(!containsChunk(x, z))
+	{
+		NBT_Debug("region %ix%i does not contain chunk %ix%i", x_pos, z_pos, x, z);
+		return nullptr;
+	}
+	
+	return getChunkRel(x, z);
+}
+
+Chunk* MCRegion::getChunkRel(int32_t x, int32_t z)
+{
+	auto it = data.find(Chunk::Key(x, z));
+	if(it == data.end() || it->second == nullptr)
+	{
+		//NBT_Debug("itend: %i, second:%p", it == data.end(), it->second);
+		return nullptr;
+	}
+	
+	return it->second;
+}
+
+
