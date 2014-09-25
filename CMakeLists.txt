@@ -1,27 +1,37 @@
-project(mcmap CXX)
+cmake_minimum_required(VERSION 2.8)
+project(libmcmap CXX)
 
-find_package(ZLIB)
-include_directories(${ZLIB_INCLUDE_DIRS})
+find_package(ZLIB REQUIRED)
 
-if(NOT ${ZLIB_LIBRARY})
-	set(ZLIB_LIBRARY "/usr/lib/x86_64-linux-gnu/libz.so")
-endif(NOT ${ZLIB_LIBRARY})
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+   add_definitions(-DDEBUG -O0 -ggdb3)
+else()
+   add_definitions(-O2 -s -march=native)
+endif()
 
-add_definitions(-fPIC ${NBT_CFLAGS})
+add_definitions(-fPIC -Wextra -Wall -pipe -std=gnu++11 -I${LIBNBT_DIR})
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${ZLIB_INCLUDE_DIRS})
+
+option(LIBNBT_DIR "path to libnbt")
 
 add_library(mcmap SHARED
-	Block.cpp
-	BlockMaps.cpp
-	Chunk.cpp
-	Level.cpp
-	Map.cpp
-	Player.cpp
-	MCRegion.cpp
-	PairHash.cpp
+	src/Block.cpp
+	src/BlockMaps.cpp
+	src/Chunk.cpp
+	src/Level.cpp
+	src/Map.cpp
+	src/Player.cpp
+	src/MCRegion.cpp
+	src/PairHash.cpp
+	include/Block.h
+	include/BlockMaps.h
+	include/Chunk.h
+	include/Level.h
+	include/Map.h
+	include/Player.h
+	include/MCRegion.h
+	include/PairHash.h
 )
 
-add_dependencies(mcmap nbt)
-target_link_libraries(mcmap ${ZLIB_LIBRARIES} ${NBT_LIBS})
-
-set(MAP_CFLAGS -I${CMAKE_CURRENT_SOURCE_DIR} ${NBT_CFLAGS} PARENT_SCOPE)
-set(MAP_LIBS ${NBT_LIBS} -Wl,--rpath,${CMAKE_CURRENT_BINARY_DIR} -L${CMAKE_CURRENT_BINARY_DIR} -lmcmap PARENT_SCOPE)
+target_link_libraries(mcmap ${ZLIB_LIBRARIES} -lnbt)
