@@ -79,10 +79,10 @@ MCRegion::~MCRegion()
    data.clear();
 }
 
-static int chunk_timestamp_compare(Chunk *a, Chunk *b)
+/*static int chunk_timestamp_compare(Chunk *a, Chunk *b)
 {
 	return a->offset() < b->offset();
-}
+}*/
 
 bool MCRegion::load()
 {

@@ -95,7 +95,6 @@ bool Level::dimensionScan(const std::string &path)
 	}
 	
 	struct dirent *ent = 0;
-	int path_len = path.size();
 	std::vector<DirPair> dir_queue;
 	
 	// complicated shenanigans to locate all dimensions
