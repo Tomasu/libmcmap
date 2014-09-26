@@ -394,8 +394,8 @@ if(scalar @ARGV < 1)
 our $block_java_path = $ARGV[0];
 
 our $file_dir = $ARGV[1];
-our $src_file_name = catfile($file_dir, 'BlockMaps.cpp');
-our $hdr_file_name = catfile($file_dir, 'BlockMaps.h');
+our $src_file_name = catfile($file_dir, 'src/BlockMaps.cpp');
+our $hdr_file_name = catfile($file_dir, 'include/BlockMaps.h');
 
 our $blocks = load_blocks($block_java_path);
 #dump($blocks);

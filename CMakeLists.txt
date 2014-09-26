@@ -68,6 +68,8 @@ set(MCMAP_SOURCES
 add_library(mcmap SHARED ${MCMAP_SOURCES} ${MCMAP_HEADERS})
 target_link_libraries(mcmap ${ZLIB_LIBRARIES} ${LIBNBT_LIBRARIES})
 
+set_target_properties(mcmap PROPERTIES PUBLIC_HEADER "${MCMAP_HEADERS}")
+
 # Add all targets to the build-tree export set
 export(TARGETS mcmap
   FILE "${PROJECT_BINARY_DIR}/LibMCMapTargets.cmake")
@@ -81,12 +83,12 @@ file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}"
    "${INSTALL_INCLUDE_DIR}")
    
 # ... for the build tree
-set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}")
+set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}")
 configure_file(cmake/LibMCMapConfig.cmake.in
   "${PROJECT_BINARY_DIR}/LibMCMapConfig.cmake" @ONLY)
 
 # ... for the install tree
-set(CONF_INCLUDE_DIRS "\${LIBMCMAP_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+set(CONF_INCLUDE_DIRS "\${LIBMCMAP_CMAKE_DIR}/${REL_INCLUDE_DIR}/libmcmap")
 configure_file(cmake/LibMCMapConfig.cmake.in
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/LibMCMapConfig.cmake" @ONLY)
 # ... for both

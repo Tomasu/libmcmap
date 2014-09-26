@@ -9,8 +9,6 @@ set(LIBMCMAP_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
  
 # Our library dependencies (contains definitions for IMPORTED targets)
 if(NOT TARGET mcmap AND NOT LIBMCMAP_BINARY_DIR)
-	include(CMakeFindDependencyMacro)
-	find_dependency(LibNBT)
 	include("${LIBMCMAP_CMAKE_DIR}/LibMCMapTargets.cmake")
 endif()
  
