@@ -415,6 +415,7 @@ say $hdr_fh "#define BLOCKMAPS_H_GUARD\n";
 say $hdr_fh "#include <cstdint>\n";
 say $hdr_fh "#define BLOCK_COUNT ".scalar(@$blocks);
 say $hdr_fh "extern const char *BlockNames[BLOCK_COUNT];";
+say $hdr_fh "extern const char *BlockTexNames[BLOCK_COUNT];";
 
 say $src_fh "#include \"BlockMaps.h\"\n";
 say $src_fh "const char *BlockNames[BLOCK_COUNT] = {";
@@ -422,6 +423,18 @@ for(my $i = 0; $i < scalar(@$blocks); $i++)
 {
 	#next unless defined $blocks->[$i];
 	my $name = defined $blocks->[$i] ? readable_name($blocks->[$i]{'name'}) : '';
+	say $src_fh "\t\"".$name."\", // $i";
+}
+say $src_fh "};\n";
+
+say $src_fh "const char *BlockTexNames[BLOCK_COUNT] = {";
+for(my $i = 0; $i < scalar(@$blocks); $i++)
+{
+	#next unless defined $blocks->[$i];
+	my $name = (defined $blocks->[$i] &&
+					exists $blocks->[$i]{'props'} &&
+					exists $blocks->[$i]{'props'}{'BlockTextureName'}) ?
+		$blocks->[$i]{'props'}{'BlockTextureName'} : '';
 	say $src_fh "\t\"".$name."\", // $i";
 }
 say $src_fh "};\n";
@@ -536,7 +549,7 @@ sub load_blocks
 		
 			my $text = $line;
 			my $tree = $block_parser->statement($text);
-#			say "reg: ".$text;
+			say "reg: ".$text;
 			
 			exit(1) unless defined $tree;
 
@@ -547,26 +560,28 @@ sub load_blocks
 			
 			if (defined $var_tree)
 			{
-				$tree->[3] = $var_tree;
+				pop @{$tree}; # remove varX
+				push @{$tree}, @$var_tree;
+				#$tree->[3] = $var_tree;
 				$var_tree = undef;
 			}
 			
-			#dump($tree);
+			say "full tree: ".dump($tree);
 			
 			my $block = build_block($2, $tree);
-			dump($block);
+			say "built block: " . dump($block);
 			$blocks[$block->{'id'}] = $block;
 		#	say "got $1 $2 $3";
 		}
 		elsif($line =~ /^\s*Block\s+\w+\d+\s*=\s*(.*)$/)
 		{
 			my $tree = $block_parser->statement($1);
-#			say "var: ".$1;
-#			dump($tree);
+			say "var: ".$1;
+			say "var tree: ".dump($tree);
 			exit(1) unless defined $tree;
 			if (ref $tree->[0] && $tree->[0][0] =~ /^Block\w*$/)
 			{
-				$var_tree = $tree->[0];
+				$var_tree = $tree;
 			}
 		}
 		else
@@ -659,6 +674,10 @@ sub build_block
 		if(ref($arr->[$i]) eq 'ARRAY' && $arr->[$i][0] =~ /^set(\w+)/)
 		{
 			$block{'props'}{$1} = $arr->[$i][1];
+			say("matched prop: ref:'".ref($arr->[$i])."' ".((ref($arr->[$i]) eq 'ARRAY') ? ' 0:'.$arr->[$i][0] : '')." ".$arr->[$i]);
+		}
+		else {
+			say("unmatched prop? ref:'".ref($arr->[$i])."' ".((ref($arr->[$i]) eq 'ARRAY') ? ' 0:'.$arr->[$i][0] : '')." ".$arr->[$i]);
 		}
 	}
 	

@@ -5,6 +5,7 @@
 
 #define BLOCK_COUNT 176
 extern const char *BlockNames[BLOCK_COUNT];
+extern const char *BlockTexNames[BLOCK_COUNT];
 struct SubBlockRange { uint32_t start; uint32_t num; };
 extern SubBlockRange subBlockRange[BLOCK_COUNT];
 #define SUBBLOCKNAME_COUNT 905

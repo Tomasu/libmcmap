@@ -86,6 +86,9 @@ MCRegion::~MCRegion()
 
 bool MCRegion::load()
 {
+	if(data.size())
+		return true;
+	
 	if(!file_exists)
 	{
 		fprintf(stderr, "region %ix%i doesn't have a file!'\n", x_pos, z_pos);
@@ -394,7 +397,7 @@ Chunk* MCRegion::getChunkRel(int32_t x, int32_t z)
 	auto it = data.find(Chunk::Key(x, z));
 	if(it == data.end() || it->second == nullptr)
 	{
-		//NBT_Debug("itend: %i, second:%p", it == data.end(), it->second);
+		NBT_Debug("itend: %i, second:%p", it == data.end(), it != data.end() ? it->second : nullptr);
 		return nullptr;
 	}
 	
