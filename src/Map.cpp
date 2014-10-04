@@ -54,9 +54,18 @@ bool Map::load()
 		if(e->d_name[0] == '.')
 			continue;
 		
+		
 		std::string ent_path = map_path;
+		
 		ent_path.append("/");
 		ent_path.append(e->d_name);
+		
+		size_t pos = ent_path.rfind(".mca", std::string::npos);
+		NBT_Debug("ent_path: %s pos:%i", ent_path.c_str(), pos);
+		
+		if(pos == std::string::npos)
+			continue;
+		
 		MCRegion *new_region = new MCRegion(ent_path);
 		//printf("found region: %ix%i\n", new_region->x(), new_region->z());
 		data.emplace(new_region->key(), new_region);
