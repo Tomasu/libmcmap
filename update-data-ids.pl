@@ -131,7 +131,7 @@ our %metadata = (
 		
 		return \@names;
 	})->(),
-	'grass' => [ 'Shrub', 'Grass', 'Fern', 'Shrub2' ],
+	'tallgrass' => [ 'Shrub', 'Grass', 'Fern', 'Shrub2' ],
 	'yellow_flower' => [ 'Dandelion' ],
 	'red_flower' => [ 'Poppy', 'Blue Orchid', 'Allium', 'Azure Bluet', 'Red Tulip', 'White Tulip', 'Pink Tulip', 'Oxeye Daisy' ],
 	'double_plant' => (sub {

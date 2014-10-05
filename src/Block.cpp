@@ -11,8 +11,9 @@ const char *BlockName(uint32_t id, uint32_t data)
 	
 	if(subBlockRange[id].num)
 	{
-		snprintf(buff, sizeof(buff)-1, "%s %s", BlockNames[id], SubBlockNames[subBlockRange[id].start+data]);
-		return buff;
+		return SubBlockNames[subBlockRange[id].start+data];
+//		snprintf(buff, sizeof(buff)-1, "%s %s", BlockNames[id], SubBlockNames[subBlockRange[id].start+data]);
+//		return buff;
 	}
 	
 	return BlockNames[id];
