@@ -19,8 +19,8 @@ const char *BlockName(uint32_t id, uint32_t data)
 	return BlockNames[id];
 }
 
-const char *BlockTexName(uint32_t id, uint32_t)
+const char *BlockStateName(uint32_t id, uint32_t)
 {
-	return BlockTexNames[id];
+	return BlockStateNames[id];
 }
 

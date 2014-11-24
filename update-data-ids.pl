@@ -415,7 +415,7 @@ say $hdr_fh "#define BLOCKMAPS_H_GUARD\n";
 say $hdr_fh "#include <cstdint>\n";
 say $hdr_fh "#define BLOCK_COUNT ".scalar(@$blocks);
 say $hdr_fh "extern const char *BlockNames[BLOCK_COUNT];";
-say $hdr_fh "extern const char *BlockTexNames[BLOCK_COUNT];";
+say $hdr_fh "extern const char *BlockStateNames[BLOCK_COUNT];";
 
 say $src_fh "#include \"BlockMaps.h\"\n";
 say $src_fh "const char *BlockNames[BLOCK_COUNT] = {";
@@ -427,14 +427,13 @@ for(my $i = 0; $i < scalar(@$blocks); $i++)
 }
 say $src_fh "};\n";
 
-say $src_fh "const char *BlockTexNames[BLOCK_COUNT] = {";
+say $src_fh "const char *BlockStateNames[BLOCK_COUNT] = {";
 for(my $i = 0; $i < scalar(@$blocks); $i++)
 {
 	#next unless defined $blocks->[$i];
 	my $name = (defined $blocks->[$i] &&
-					exists $blocks->[$i]{'props'} &&
-					exists $blocks->[$i]{'props'}{'BlockTextureName'}) ?
-		$blocks->[$i]{'props'}{'BlockTextureName'} : '';
+					exists $blocks->[$i]{'name'}) ?
+		$blocks->[$i]{'name'} : '';
 	say $src_fh "\t\"".$name."\", // $i";
 }
 say $src_fh "};\n";
@@ -531,7 +530,7 @@ sub load_blocks
 	
 	my @blocks;
 	
-	$blocks[0] = { id => 0, name => 'Air', class => 'BlockAir' };
+	$blocks[0] = { id => 0, name => 'air', class => 'BlockAir' };
 	
 	my $var_tree = undef;
 	
@@ -542,7 +541,8 @@ sub load_blocks
 		
 		#next if $line !~ /\s*public static final Block/;
 		
-		if($line =~ /^\s*blockRegistry\.addObject\((\d+),\s*"(\w+)",\s*(.*)\);$/)
+		if($line =~ /^\s*registerBlock\((\d+),\s*"(\w+)",\s*(.*)\);$/)
+		#if($line =~ /^\s*blockRegistry\.addObject\((\d+),\s*"(\w+)",\s*(.*)\);$/)
 		#if($line =~ /^\s*public static final Block\w*\s+(\w+)\s*=\s*(.*)$/)
 		#if($line =~ /^\s*public static final Block\w*\s+(\w+)\s*=\s*(?:\([^)]+\))?\(new\s+(Block\w*)\s*\((\d+).*setUnlocalizedName\(\"([^"]+)\"\)/)
 		{
@@ -774,5 +774,7 @@ statement: func_call | dotlist | cast_statement dotlist { $return = $item[2] } |
 
 EOG
 
-	return new Parse::RecDescent ($grammar) or die "Bad grammar!\n";
+	my $parser = Parse::RecDescent->new($grammar);
+	if(!defined $parser) { die "Bad grammar!\n"; }
+	return $parser;
 }

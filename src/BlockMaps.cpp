@@ -166,21 +166,43 @@ const char *BlockNames[BLOCK_COUNT] = {
 	"Log2", // 162
 	"Acacia Stairs", // 163
 	"Dark Oak Stairs", // 164
-	"", // 165
-	"", // 166
-	"", // 167
-	"", // 168
-	"", // 169
+	"Slime", // 165
+	"Barrier", // 166
+	"Iron Trapdoor", // 167
+	"Prismarine", // 168
+	"Sea Lantern", // 169
 	"Hay Block", // 170
 	"Carpet", // 171
 	"Hardened Clay", // 172
 	"Coal Block", // 173
 	"Packed Ice", // 174
 	"Double Plant", // 175
+	"Standing Banner", // 176
+	"Wall Banner", // 177
+	"Daylight Detector Inverted", // 178
+	"Red Sandstone", // 179
+	"Red Sandstone Stairs", // 180
+	"Double Stone Slab2", // 181
+	"Slab2", // 182
+	"Spruce Fence Gate", // 183
+	"Birch Fence Gate", // 184
+	"Jungle Fence Gate", // 185
+	"Dark Oak Fence Gate", // 186
+	"Acacia Fence Gate", // 187
+	"Spruce Fence", // 188
+	"Birch Fence", // 189
+	"Jungle Fence", // 190
+	"Dark Oak Fence", // 191
+	"Acacia Fence", // 192
+	"Spruce Door", // 193
+	"Birch Door", // 194
+	"Jungle Door", // 195
+	"Acacia Door", // 196
+	"Dark Oak Door", // 197
 };
 
-const char *BlockTexNames[BLOCK_COUNT] = {
-	"", // 0
+const char *BlockStateNames[BLOCK_COUNT] = {
+	"air", // 0
 	"stone", // 1
 	"grass", // 2
 	"dirt", // 3
@@ -188,10 +210,10 @@ const char *BlockTexNames[BLOCK_COUNT] = {
 	"planks", // 5
 	"sapling", // 6
 	"bedrock", // 7
-	"water_flow", // 8
-	"water_still", // 9
-	"lava_flow", // 10
-	"lava_still", // 11
+	"flowing_water", // 8
+	"water", // 9
+	"flowing_lava", // 10
+	"lava", // 11
 	"sand", // 12
 	"gravel", // 13
 	"gold_ore", // 14
@@ -207,159 +229,181 @@ const char *BlockTexNames[BLOCK_COUNT] = {
 	"sandstone", // 24
 	"noteblock", // 25
 	"bed", // 26
-	"rail_golden", // 27
-	"rail_detector", // 28
-	"", // 29
+	"golden_rail", // 27
+	"detector_rail", // 28
+	"sticky_piston", // 29
 	"web", // 30
-	"", // 31
+	"tallgrass", // 31
 	"deadbush", // 32
-	"", // 33
-	"", // 34
-	"wool_colored", // 35
-	"", // 36
-	"flower_dandelion", // 37
-	"flower_rose", // 38
-	"mushroom_brown", // 39
-	"mushroom_red", // 40
+	"piston", // 33
+	"piston_head", // 34
+	"wool", // 35
+	"piston_extension", // 36
+	"yellow_flower", // 37
+	"red_flower", // 38
+	"brown_mushroom", // 39
+	"red_mushroom", // 40
 	"gold_block", // 41
 	"iron_block", // 42
-	"", // 43
-	"", // 44
-	"brick", // 45
+	"double_stone_slab", // 43
+	"stone_slab", // 44
+	"brick_block", // 45
 	"tnt", // 46
 	"bookshelf", // 47
-	"cobblestone_mossy", // 48
+	"mossy_cobblestone", // 48
 	"obsidian", // 49
-	"torch_on", // 50
+	"torch", // 50
 	"fire", // 51
 	"mob_spawner", // 52
-	"", // 53
-	"", // 54
-	"redstone_dust", // 55
+	"oak_stairs", // 53
+	"chest", // 54
+	"redstone_wire", // 55
 	"diamond_ore", // 56
 	"diamond_block", // 57
 	"crafting_table", // 58
 	"wheat", // 59
 	"farmland", // 60
-	"", // 61
-	"", // 62
-	"", // 63
-	"door_wood", // 64
+	"furnace", // 61
+	"lit_furnace", // 62
+	"standing_sign", // 63
+	"wooden_door", // 64
 	"ladder", // 65
-	"rail_normal", // 66
-	"", // 67
-	"", // 68
+	"rail", // 66
+	"stone_stairs", // 67
+	"wall_sign", // 68
 	"lever", // 69
-	"", // 70
-	"door_iron", // 71
-	"", // 72
+	"stone_pressure_plate", // 70
+	"iron_door", // 71
+	"wooden_pressure_plate", // 72
 	"redstone_ore", // 73
-	"redstone_ore", // 74
-	"redstone_torch_off", // 75
-	"redstone_torch_on", // 76
-	"", // 77
-	"snow", // 78
+	"lit_redstone_ore", // 74
+	"unlit_redstone_torch", // 75
+	"redstone_torch", // 76
+	"stone_button", // 77
+	"snow_layer", // 78
 	"ice", // 79
 	"snow", // 80
 	"cactus", // 81
 	"clay", // 82
 	"reeds", // 83
 	"jukebox", // 84
-	"", // 85
+	"fence", // 85
 	"pumpkin", // 86
 	"netherrack", // 87
 	"soul_sand", // 88
 	"glowstone", // 89
 	"portal", // 90
-	"pumpkin", // 91
+	"lit_pumpkin", // 91
 	"cake", // 92
-	"repeater_off", // 93
-	"repeater_on", // 94
-	"glass", // 95
+	"unpowered_repeater", // 93
+	"powered_repeater", // 94
+	"stained_glass", // 95
 	"trapdoor", // 96
-	"", // 97
+	"monster_egg", // 97
 	"stonebrick", // 98
-	"mushroom_block", // 99
-	"mushroom_block", // 100
-	"", // 101
-	"", // 102
-	"melon", // 103
+	"brown_mushroom_block", // 99
+	"red_mushroom_block", // 100
+	"iron_bars", // 101
+	"glass_pane", // 102
+	"melon_block", // 103
 	"pumpkin_stem", // 104
 	"melon_stem", // 105
 	"vine", // 106
-	"", // 107
-	"", // 108
-	"", // 109
+	"fence_gate", // 107
+	"brick_stairs", // 108
+	"stone_brick_stairs", // 109
 	"mycelium", // 110
 	"waterlily", // 111
 	"nether_brick", // 112
-	"", // 113
-	"", // 114
+	"nether_brick_fence", // 113
+	"nether_brick_stairs", // 114
 	"nether_wart", // 115
 	"enchanting_table", // 116
 	"brewing_stand", // 117
 	"cauldron", // 118
-	"", // 119
-	"endframe", // 120
+	"end_portal", // 119
+	"end_portal_frame", // 120
 	"end_stone", // 121
 	"dragon_egg", // 122
-	"redstone_lamp_off", // 123
-	"redstone_lamp_on", // 124
-	"", // 125
-	"", // 126
+	"redstone_lamp", // 123
+	"lit_redstone_lamp", // 124
+	"double_wooden_slab", // 125
+	"wooden_slab", // 126
 	"cocoa", // 127
-	"", // 128
+	"sandstone_stairs", // 128
 	"emerald_ore", // 129
-	"", // 130
-	"trip_wire_source", // 131
-	"trip_wire", // 132
+	"ender_chest", // 130
+	"tripwire_hook", // 131
+	"tripwire", // 132
 	"emerald_block", // 133
-	"", // 134
-	"", // 135
-	"", // 136
+	"spruce_stairs", // 134
+	"birch_stairs", // 135
+	"jungle_stairs", // 136
 	"command_block", // 137
 	"beacon", // 138
-	"", // 139
+	"cobblestone_wall", // 139
 	"flower_pot", // 140
 	"carrots", // 141
 	"potatoes", // 142
-	"", // 143
+	"wooden_button", // 143
 	"skull", // 144
-	"", // 145
-	"", // 146
-	"", // 147
-	"", // 148
-	"comparator_off", // 149
-	"comparator_on", // 150
+	"anvil", // 145
+	"trapped_chest", // 146
+	"light_weighted_pressure_plate", // 147
+	"heavy_weighted_pressure_plate", // 148
+	"unpowered_comparator", // 149
+	"powered_comparator", // 150
 	"daylight_detector", // 151
 	"redstone_block", // 152
 	"quartz_ore", // 153
 	"hopper", // 154
 	"quartz_block", // 155
-	"", // 156
-	"rail_activator", // 157
+	"quartz_stairs", // 156
+	"activator_rail", // 157
 	"dropper", // 158
-	"hardened_clay_stained", // 159
-	"glass", // 160
-	"leaves", // 161
-	"log", // 162
-	"", // 163
-	"", // 164
-	"", // 165
-	"", // 166
-	"", // 167
-	"", // 168
-	"", // 169
+	"stained_hardened_clay", // 159
+	"stained_glass_pane", // 160
+	"leaves2", // 161
+	"log2", // 162
+	"acacia_stairs", // 163
+	"dark_oak_stairs", // 164
+	"slime", // 165
+	"barrier", // 166
+	"iron_trapdoor", // 167
+	"prismarine", // 168
+	"sea_lantern", // 169
 	"hay_block", // 170
-	"", // 171
+	"carpet", // 171
 	"hardened_clay", // 172
 	"coal_block", // 173
-	"ice_packed", // 174
-	"", // 175
+	"packed_ice", // 174
+	"double_plant", // 175
+	"standing_banner", // 176
+	"wall_banner", // 177
+	"daylight_detector_inverted", // 178
+	"red_sandstone", // 179
+	"red_sandstone_stairs", // 180
+	"double_stone_slab2", // 181
+	"stone_slab2", // 182
+	"spruce_fence_gate", // 183
+	"birch_fence_gate", // 184
+	"jungle_fence_gate", // 185
+	"dark_oak_fence_gate", // 186
+	"acacia_fence_gate", // 187
+	"spruce_fence", // 188
+	"birch_fence", // 189
+	"jungle_fence", // 190
+	"dark_oak_fence", // 191
+	"acacia_fence", // 192
+	"spruce_door", // 193
+	"birch_door", // 194
+	"jungle_door", // 195
+	"acacia_door", // 196
+	"dark_oak_door", // 197
 };
 
 SubBlockRange subBlockRange[BLOCK_COUNT] = {
-	{ 0, 0 }, // 0
+	{ 0, 0 },
 	{ 0, 0 }, // 1
 	{ 0, 0 }, // 2
 	{ 0, 0 }, // 3
@@ -524,17 +568,39 @@ SubBlockRange subBlockRange[BLOCK_COUNT] = {
 	{ 852, 16 }, // 162
 	{ 868, 8 }, // 163
 	{ 876, 8 }, // 164
-	{ 0, 0 },
-	{ 0, 0 },
-	{ 0, 0 },
-	{ 0, 0 },
-	{ 0, 0 },
+	{ 884, 0 }, // 165
+	{ 884, 0 }, // 166
+	{ 884, 0 }, // 167
+	{ 884, 0 }, // 168
+	{ 884, 0 }, // 169
 	{ 884, 0 }, // 170
 	{ 884, 15 }, // 171
 	{ 899, 0 }, // 172
 	{ 899, 0 }, // 173
 	{ 899, 0 }, // 174
 	{ 899, 6 }, // 175
+	{ 905, 0 }, // 176
+	{ 905, 0 }, // 177
+	{ 905, 0 }, // 178
+	{ 905, 0 }, // 179
+	{ 905, 0 }, // 180
+	{ 905, 0 }, // 181
+	{ 905, 0 }, // 182
+	{ 905, 0 }, // 183
+	{ 905, 0 }, // 184
+	{ 905, 0 }, // 185
+	{ 905, 0 }, // 186
+	{ 905, 0 }, // 187
+	{ 905, 0 }, // 188
+	{ 905, 0 }, // 189
+	{ 905, 0 }, // 190
+	{ 905, 0 }, // 191
+	{ 905, 0 }, // 192
+	{ 905, 0 }, // 193
+	{ 905, 0 }, // 194
+	{ 905, 0 }, // 195
+	{ 905, 0 }, // 196
+	{ 905, 0 }, // 197
 };
 
 const char *SubBlockNames[SUBBLOCKNAME_COUNT] = {
