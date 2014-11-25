@@ -97,16 +97,60 @@ our @stairs_names = (sub {
 	return @names;
 })->();
 	
-our @tree_names = ( 'Oak', 'Spruce', 'Birch', 'Jungle', 'Acacia', 'Dark Oak' );
-our @color_names = ( 'Regular', 'Orange', 'Magenta', 'Light Blue', 'Yellow', 'Lime', 'Pink', 'Gray', 'Light Gray', 'Cyan', 'Purple', 'Blue', 'Green', 'Red', 'Black' );
+our @wood_names = ( 'Oak', 'Spruce', 'Birch', 'Jungle', 'Acacia', 'Dark Oak' );
+our @color_names = ( 'White', 'Orange', 'Magenta', 'Light Blue', 'Yellow', 'Lime', 'Pink', 'Gray', 'Light Gray', 'Cyan', 'Purple', 'Blue', 'Green', 'Red', 'Black' );
+
+our @tree1_names = ( 'oak', 'spruce', 'birch', 'jungle' );
+our @tree2_names = ( 'acacia', 'dark_oak' );
+
+our @treeall_names = ( @tree1_names, @tree2_names );
+
+our @woodslab_names = map { $_ . '_wooden_slab' } @treeall_names;
+
+sub sateify($)
+{
+	my $txt = lc shift;
+	
+	$txt =~ s/\s+/_/;
+	
+	return $txt
+}
+
+our %state_metadata = (
+	'sand' => [ 'sand', 'red_sand' ],
+	'planks' => [ map { sateify($_) . '_planks' } @treeall_names ],
+	'sapling' => [ map { sateify($_) . '_sapling' } @treeall_names ],
+	'log' => [ map { $_ . '_log' } (@tree1_names, @tree1_names, @tree1_names, @tree1_names) ],
+	'log2' => [ map { $_ . '_log' } (@tree2_names, @tree2_names, @tree2_names, @tree2_names, @tree2_names, @tree2_names, @tree2_names, @tree2_names) ],
+	'leaves' => [ map { $_ . '_leaves' } @tree1_names ],
+	'leaves2' => [ map { $_ . '_leaves' } @tree2_names ],
+	'wool' => [ map { sateify($_) . '_wool' } @color_names ],
+	'carpet' => [ map { sateify($_) . '_carpet' } @color_names ],
+	'stained_hardened_clay' => [ map { sateify($_) . '_stained_hardened_clay' } @color_names ],
+	'stained_glass' => [ map { sateify($_) . '_stained_glass' } @color_names ],
+	'stained_glass_pane' => [ map { sateify($_) . '_stained_glass_pane' } @color_names ],
+	'stone_slab' => [ 'stone_slab', 'sandstone_slab', 'wood_old_slab', 'cobblestone_slab', 'brick_slab', 'stone_brick_slab', 'nether_brick_slab', 'quartz_slab', 'stone_slab', 'sandstone_slab', 'wood_old_slab', 'cobblestone_slab', 'brick_slab', 'stone_brick_slab', 'nether_brick_slab', 'quartz_slab' ],
+	'double_stone_slab' => [ 'stone_double_slab', 'sandstone_double_slab', 'wood_old_double_slab', 'cobblestone_double_slab', 'brick_double_slab', 'stone_brick_double_slab', 'nether_brick_double_slab', 'quartz_double_slab', 'stone_double_slab', 'sandstone_double_slab', 'quartz_double_slab' ],
+	'wooden_slab' => [ @woodslab_names, undef, undef, @woodslab_names, undef, undef ],
+	'double_wooden_slab' => [ map { $_ . '_double_slab' } @treeall_names ],
+	'sandstone' => [ 'sandstone', 'chiseled_sandstone', 'smooth_sandstone' ],
+	'tallgrass' => [ 'dead_bush', 'tall_grass', 'fern' ],
+	'yellow_flower' => [ 'dandelion' ],
+	'red_flower' => [ 'poppy', 'blue_orchid', 'allium', 'azure_bluet', 'red_tulip', 'white_tulip', 'pink_tulip', 'oxeye_daisy' ],
+	'double_plant' => [ 'sunflower', 'syringa', 'double_grass', 'double_fern', 'double_rose', 'peony', undef, undef, 'sunflower', 'syringa', 'double_grass', 'double_fern', 'double_rose', 'peony' ],
+	'monster_egg' => [ 'stone_monster_egg', 'cobblestone_monster_egg', 'stone_brick_monster_egg', 'cracked_brick_monster_egg', 'chiseled_brick_monster_egg' ],
+	'stone_brick' => [ 'stone_brick', 'mossy_stonebrick', 'cracked_stonebrick', 'chiseled_stonebrick' ],
+	'cobblestone_wall' => [ 'cobblestone_wall', 'mossy_cobblestone_wall' ],
+	'quartz_block' => [ 'quartz_block', 'chiseled_quartz_block', 'quartz_column', 'quartz_column', 'quartz_column' ]
+);
 
 our %metadata = (
-	'sand' => [ 'Sand', 'Red Sand' ],
-	'planks' => \@tree_names,
-	'sapling' => \@tree_names,
+	'sand' => [ 'Normal', 'Red' ],
+	'planks' => \@wood_names,
+	'sapling' => \@wood_names,
 	'log' => [ 'Oak', 'Spruce', 'Birch', 'Jungle', 'Oak E/W', 'Spruce E/W', 'Birch E/W', 'Jungle E/W', 'Oak N/S', 'Spruce N/S', 'Birch N/S', 'Jungle N/S', 'Oak Bark', 'Spruce Bark', 'Birch Bark', 'Jungle Bark' ],
 	'log2' => [ 'Acacia', 'Dark Oak', 'Acacia PH', 'Dark Oak PH', 'Acacia E/W', 'Dark Oak E/W', 'Acacia E/W PH', 'Dark Oak E/W PH', 'Acacia N/S', 'Dark Oak N/S', 'Acacia N/S PH', 'Dark Oak N/S PH', 'Acacia Bark', 'Dark Oak Bark', 'Acacia Bark PH', 'Dark Oak Bark PH' ],
-	'leaves' => [ 'Oak', 'Pine/Spruce', 'Birch', 'Jungle' ],
+	'leaves' => [ 'Oak', 'Spruce', 'Birch', 'Jungle' ],
 	'leaves2' => [ 'Acacia', 'Dark Oak' ],
 	'wool' => \@color_names,
 	'carpet' => \@color_names,
@@ -219,10 +263,10 @@ our %metadata = (
 		
 		return \@names;
 	})->(),
-	'stone_pressure_plate' => [ undef, 'Pressed' ],
-	'wooden_pressure_plate' => [ undef, 'Pressed' ] ,
-	'light_weighted_pressure_plate' => [ undef, 'Pressed' ],
-	'heavy_weighted_pressure_plate' => [ undef, 'Pressed' ],
+	'stone_pressure_plate' => [ 'Normal', 'Pressed' ],
+	'wooden_pressure_plate' => [ 'Normal', 'Pressed' ] ,
+	'light_weighted_pressure_plate' => [ 'Normal', 'Pressed' ],
+	'heavy_weighted_pressure_plate' => [ 'Normal', 'Pressed' ],
 	'stone_button' => \@button_names,
 	'wooden_button' => \@button_names,
 	'snow_layer' => [ 0, 1, 2, 3, 4, 5, 6, 7 ],
@@ -359,11 +403,11 @@ our %metadata = (
 		
 		return \@names;
 	})->(),
-	'cobblestone_wall' => [ 'Plain', 'Mossy' ],
+	'cobblestone_wall' => [ 'Normal', 'Mossy' ],
 	'flower_pot' => [ 'Empty', 'Poppy', 'Dandelion', 'Oak', 'Spruce', 'Birch', 'Jungle', 'Red Mushroom', 'Brown Mushroom', 'Cactus', 'Dead Bush', 'Fern', 'Acacia', 'Dark Oak' ], # only for pre 1.7?
 	'skull' => [ undef, 'Floor', 'North', 'South', 'East', 'West' ],
-	'quartz_block' => [ 'Plain', 'Chiseled', 'Vertical Pillar', 'N/S Pillar', 'E/W Pillar' ],
-	'coal_ore' => [ 'Coal', 'Charcoal' ],
+	'quartz_block' => [ 'Normal', 'Chiseled', 'Vertical Pillar', 'N/S Pillar', 'E/W Pillar' ],
+	#'coal_ore' => [ 'Coal', 'Charcoal' ],
 	'dye' => [ 'Ink Sac', 'Rose Red', 'Cactus Green', 'Cocoa Beans', 'Lapis Lazuli', 'Purple Dye', 'Cyan Dye', 'Light Gray Dye', 'Gray Dye', 'Pink Dye', 'Lime Dye', 'Dandelion Yellow', 'Light Blue Dye', 'Magenta Dye', 'Orange Dye', 'Bone Meal' ],
 	'fish' => [ 'Fish', 'Salmon', 'Clownfish', 'Pufferfish' ],
 	'anvil' => (sub {
@@ -465,7 +509,7 @@ for (my $i = 0; $i < scalar(@$blocks); $i++)
 	say $src_fh "\t{ $start, $num }, // ".$i;
 	for(my $j = 0; $j < $num; $j++)
 	{
-		push @subblock_names, { 'name' => $block->[$j], 'id' => $i, 'data' => $j };
+		push @subblock_names, { 'name' => $block->[$j], 'blockname' => $blocks->[$i]{'name'}, 'id' => $i, 'data' => $j };
 	}
 	
 	$subblock_pos += $num;
@@ -496,6 +540,10 @@ for my $block (@$blocks)
 
 say $hdr_fh "";
 
+say $hdr_fh "extern const char *SubBlockStateNames[SUBBLOCKNAME_COUNT];\n";
+
+say $hdr_fh "";
+
 say $hdr_fh "#endif";
 
 say $src_fh "const char *SubBlockNames[SUBBLOCKNAME_COUNT] = {";
@@ -508,7 +556,31 @@ for my $info (@subblock_names)
 	
 	say $src_fh "\t\"$name\", // $id:$d";
 }
+say $src_fh "};\n";
+
+say $src_fh "const char *SubBlockStateNames[SUBBLOCKNAME_COUNT] = {";
+for my $info (@subblock_names)
+{
+	next unless defined $info;
+	my $blockname = $info->{'blockname'};
+	my $id = $info->{'id'};
+	my $d = $info->{'data'};
+	my $name;
+	
+	if(exists $state_metadata{$blockname})
+	{
+		if(defined $state_metadata{$blockname}[$d])
+		{
+			$name = $state_metadata{$blockname}[$d];
+		}
+	}
+	
+	$name //= $blockname;
+	
+	say $src_fh "\t\"$name\", // $id:$d";
+}
 say $src_fh "};";
+
 say "Done.";
 
 

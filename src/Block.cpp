@@ -19,8 +19,13 @@ const char *BlockName(uint32_t id, uint32_t data)
 	return BlockNames[id];
 }
 
-const char *BlockStateName(uint32_t id, uint32_t)
+const char *BlockStateName(uint32_t id, uint32_t d)
 {
+	if(subBlockRange[id].num)
+	{
+		return SubBlockStateNames[subBlockRange[id].start+d];
+	}
+	
 	return BlockStateNames[id];
 }
 
