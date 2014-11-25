@@ -136,7 +136,7 @@ our %state_metadata = (
 	'sandstone' => [ 'sandstone', 'chiseled_sandstone', 'smooth_sandstone' ],
 	'tallgrass' => [ 'dead_bush', 'tall_grass', 'fern' ],
 	'yellow_flower' => [ 'dandelion' ],
-	'red_flower' => [ 'poppy', 'blue_orchid', 'allium', 'azure_bluet', 'red_tulip', 'white_tulip', 'pink_tulip', 'oxeye_daisy' ],
+	'red_flower' => [ 'poppy', 'blue_orchid', 'allium', 'houstonia', 'red_tulip', 'orange_tulip', 'white_tulip', 'pink_tulip', 'oxeye_daisy' ],
 	'double_plant' => [ 'sunflower', 'syringa', 'double_grass', 'double_fern', 'double_rose', 'peony', undef, undef, 'sunflower', 'syringa', 'double_grass', 'double_fern', 'double_rose', 'peony' ],
 	'monster_egg' => [ 'stone_monster_egg', 'cobblestone_monster_egg', 'stone_brick_monster_egg', 'cracked_brick_monster_egg', 'chiseled_brick_monster_egg' ],
 	'stone_brick' => [ 'stone_brick', 'mossy_stonebrick', 'cracked_stonebrick', 'chiseled_stonebrick' ],
@@ -177,17 +177,8 @@ our %metadata = (
 	})->(),
 	'tallgrass' => [ 'Shrub', 'Grass', 'Fern', 'Shrub2' ],
 	'yellow_flower' => [ 'Dandelion' ],
-	'red_flower' => [ 'Poppy', 'Blue Orchid', 'Allium', 'Azure Bluet', 'Red Tulip', 'White Tulip', 'Pink Tulip', 'Oxeye Daisy' ],
-	'double_plant' => (sub {
-		my @base_names = ( 'Sunflower', 'Lilac', 'Double Tallgrass', 'Large Fern', 'Rose Bush', 'Peony' );
-		my @names = @base_names;
-		for (my $i = 0x8; $i < scalar @base_names; $i++)
-		{
-			$names[$i] = $base_names[$i] . ' Top';
-		}
-		
-		return \@names;
-	})->(),
+	'red_flower' => [ 'Poppy', 'Blue Orchid', 'Allium', 'Azure Bluet', 'Red Tulip', 'Orange Tulip', 'White Tulip', 'Pink Tulip', 'Oxeye Daisy' ],
+	'double_plant' => [ 'Sunflower', 'Lilac', 'Double Tallgrass', 'Large Fern', 'Rose Bush', 'Peony', undef, undef, 'TOP' ],
 	'piston' => (sub {
 		my @base_names = ( 'Down', 'Up', 'North', 'South', 'West', 'East' );
 		my @names = @base_names;
