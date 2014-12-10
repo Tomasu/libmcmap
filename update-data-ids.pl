@@ -117,6 +117,8 @@ sub sateify($)
 }
 
 our %state_metadata = (
+	'dirt' => [ 'dirt', 'coarse_dirt', 'podzol' ],
+	'stone' => [ 'stone', 'granite', 'smooth_granite', 'diorite', 'smooth_diorite', 'andesite', 'smooth_andesite' ],
 	'sand' => [ 'sand', 'red_sand' ],
 	'planks' => [ map { sateify($_) . '_planks' } @treeall_names ],
 	'sapling' => [ map { sateify($_) . '_sapling' } @treeall_names ],
@@ -145,6 +147,8 @@ our %state_metadata = (
 );
 
 our %metadata = (
+	'dirt' => [ 'Normal', 'Coarse Dirt', 'Podzol' ],
+	'stone' => [ 'Normal', 'Granite', 'Smooth Granite', 'Diorite', 'Smooth Diorite', 'Andesite', 'Smooth Andesite' ],
 	'sand' => [ 'Normal', 'Red' ],
 	'planks' => \@wood_names,
 	'sapling' => \@wood_names,

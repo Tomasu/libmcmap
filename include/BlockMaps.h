@@ -8,13 +8,23 @@ extern const char *BlockNames[BLOCK_COUNT];
 extern const char *BlockStateNames[BLOCK_COUNT];
 struct SubBlockRange { uint32_t start; uint32_t num; };
 extern SubBlockRange subBlockRange[BLOCK_COUNT];
-#define SUBBLOCKNAME_COUNT 907
+#define SUBBLOCKNAME_COUNT 917
 extern const char *SubBlockNames[SUBBLOCKNAME_COUNT];
 
 #define BLOCK_AIR 0
 #define BLOCK_STONE 1
+#define BLOCK_STONE_DATA_NORMAL 0
+#define BLOCK_STONE_DATA_GRANITE 1
+#define BLOCK_STONE_DATA_SMOOTH_GRANITE 2
+#define BLOCK_STONE_DATA_DIORITE 3
+#define BLOCK_STONE_DATA_SMOOTH_DIORITE 4
+#define BLOCK_STONE_DATA_ANDESITE 5
+#define BLOCK_STONE_DATA_SMOOTH_ANDESITE 6
 #define BLOCK_GRASS 2
 #define BLOCK_DIRT 3
+#define BLOCK_DIRT_DATA_NORMAL 0
+#define BLOCK_DIRT_DATA_COARSE_DIRT 1
+#define BLOCK_DIRT_DATA_PODZOL 2
 #define BLOCK_COBBLESTONE 4
 #define BLOCK_PLANKS 5
 #define BLOCK_PLANKS_DATA_OAK 0
