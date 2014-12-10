@@ -70,8 +70,28 @@ bool Face::load(Variant *variant, FaceDirection dir, rapidjson::Value &v, Resour
 		}
 		else if(it->name == "rotation")
 		{
-			//rotation = -it->value.GetDouble();
+			rotation = -it->value.GetDouble();
 		}
+	}
+	
+	if(uv.f1 == 0.0 && uv.f2 == 0.0 && uv.f3 == 0.0 && uv.f4 == 0.0)
+	{
+		uv.f1 = 0.0;
+		uv.f2 = 0.0;
+		uv.f3 = 1.0;
+		uv.f4 = 1.0;
+	}
+	
+	if(rotation != 0.0)
+	{
+		ALLEGRO_TRANSFORM rot;
+		al_identity_transform(&rot);
+		al_translate_transform(&rot, -0.5, -0.5);
+		al_rotate_transform(&rot, DEG_TO_RAD(rotation));
+		al_translate_transform(&rot, 0.5, 0.5);
+		
+		//al_transform_coordinates(&rot, &uv.f1, &uv.f2);
+		//al_transform_coordinates(&rot, &uv.f3, &uv.f4);
 	}
 	
 	tex_res = rm->getBitmap(texname);
@@ -99,18 +119,6 @@ bool Face::load(Variant *variant, FaceDirection dir, rapidjson::Value &v, Resour
 		uv.f2 = 0.0;
 		uv.f3 = 1.0 * atlas->xfact();
 		uv.f4 = 1.0 * atlas->yfact();
-	}
-	
-	if(rotation != 0.0)
-	{
-		ALLEGRO_TRANSFORM rot;
-		al_identity_transform(&rot);
-		al_translate_transform(&rot, -0.5, -0.5);
-		al_rotate_transform(&rot, DEG_TO_RAD(rotation));
-		al_translate_transform(&rot, 0.5, 0.5);
-		
-		al_transform_coordinates(&rot, &uv.f1, &uv.f2);
-		al_transform_coordinates(&rot, &uv.f3, &uv.f4);
 	}
 	
 	return true;

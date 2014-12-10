@@ -62,6 +62,8 @@ struct Element {
 		
 		bool loadFaces(Variant *variant, rapidjson::Value &v, ResourceManager *rm);
 		bool load(Variant *variant, rapidjson::Value &v, ResourceManager *rm);
+		
+		void rotate();
 };
 
 }

@@ -3,6 +3,9 @@
 
 #include "Resource/Manager.h"
 
+#include <allegro5/allegro.h>
+#include "al_ext.h"
+
 namespace MCModel {
 
 bool Element::loadFaces(Variant *variant, rapidjson::Value &v, ResourceManager *rm)
@@ -59,6 +62,8 @@ bool Element::loadFaces(Variant *variant, rapidjson::Value &v, ResourceManager *
 			face_count++;
 		}
 	}
+	
+	rotate(); // rotates from/to coords.
 	
 	vertex_count = face_count * 6;
 	vertices = new CUSTOM_VERTEX[vertex_count];
@@ -149,6 +154,25 @@ bool Element::loadFaces(Variant *variant, rapidjson::Value &v, ResourceManager *
 	NBT_Debug("wanted verts: %i, got %i", vertex_count, vidx);
 	
 	return true;
+}
+
+void Element::rotate()
+{
+	ALLEGRO_TRANSFORM rot;
+	al_identity_transform(&rot);
+	al_translate_transform_3d(&rot, -(rotation.origin.f1/2), -(rotation.origin.f2/2), -(rotation.origin.f3/2));
+	
+	if(rotation.axis == Rotation::AXIS_X)
+		al_rotate_transform_3d(&rot, 1.0, 0.0, 0.0, rotation.angle);
+	else if(rotation.axis == Rotation::AXIS_Y)
+		al_rotate_transform_3d(&rot, 0.0, 1.0, 0.0, rotation.angle);
+	else if(rotation.axis == Rotation::AXIS_Z)
+		al_rotate_transform_3d(&rot, 0.0, 0.0, 1.0, rotation.angle);
+	
+	al_translate_transform_3d(&rot, (rotation.origin.f1/2), (rotation.origin.f2/2), (rotation.origin.f3/2));
+	
+	al_transform_coordinates_3d(&rot, &(from.f1), &(from.f2), &(from.f3));
+	al_transform_coordinates_3d(&rot, &(to.f1), &(to.f2), &(to.f3));
 }
 
 bool Element::load(Variant *variant, rapidjson::Value &v, ResourceManager *rm)
