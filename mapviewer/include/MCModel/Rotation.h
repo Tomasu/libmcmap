@@ -20,7 +20,11 @@ namespace MCModel {
 		float angle;
 		bool rescale;
 		
+		Rotation() : origin(), axis(AXIS_NONE), angle(0.0), rescale(0.0) { }
+		
 		bool load(rapidjson::Value &v);
+		
+		bool shouldRotate() { return angle != 0.0; }
 	};
 
 }

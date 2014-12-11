@@ -63,7 +63,8 @@ bool Element::loadFaces(Variant *variant, rapidjson::Value &v, ResourceManager *
 		}
 	}
 	
-	rotate(); // rotates from/to coords.
+	if(rotation.shouldRotate())
+		rotate(); // rotates from/to coords.
 	
 	vertex_count = face_count * 6;
 	vertices = new CUSTOM_VERTEX[vertex_count];
