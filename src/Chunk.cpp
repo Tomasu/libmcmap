@@ -13,7 +13,7 @@
 
 Chunk::Chunk(int t, int x, int z, int co, int cl) : x_pos(x), z_pos(z), timestamp(t), chunk_offset(co), chunk_len(cl), nbt_data(0)
 {
-	
+	memset(sections, 0, sizeof(sections));
 }
 
 Chunk::~Chunk()
@@ -76,16 +76,46 @@ bool Chunk::load(NBT_File *fh)
 		if(!level_tag)
 		{
 			NBT_Error("chunk is missing Level tag");
-			return false;
+			goto chunk_load_bail;
 		}
 		
 		x_pos = level_tag->getInt("xPos");
 		z_pos = level_tag->getInt("zPos");
+		
+		NBT_Tag_Compound *sections_tag = level_tag->getCompound("Sections");
+		if(!sections_tag)
+		{
+			NBT_Error("chunk is missing Sections tag");
+			goto chunk_load_bail;
+		}
+		
+		for(uint32_t section_id = 0; section_id < sections_tag.count(); section_id++)
+		{
+			NBT_Tag_Compound *section_tag = (NBT_Tag_Compound*)section_tag.itemAt(section_id);
+			
+			ChunkSection *rcs = new RendererChunkSection();
+			if(!rcs->init(section_id, section_tag))
+			{
+				NBT_Debug("failed to initialize ChunkSection(%i)", section_id);
+				delete rcs;
+				goto chunk_load_bail;
+			}
+			
+			sections[rcs->y()] = rcs;
+		}
+		
 	}
 	
 	//NBT_Debug("end");
 	
 	return nbt_data != 0;
+	
+chunk_load_bail:
+	for(int i = 0; i < MAX_SECTIONS; i++)
+		delete sections[i];
+	
+	if(nbt_data)
+		delete nbt_data;
 }
 
 bool Chunk::save(NBT_File *fh)
@@ -121,4 +151,28 @@ bool Chunk::save(NBT_File *fh)
 	return true;
 }
 
+bool Chunk::getBlockAddress(int32_t x, int32_t y, int32_t z, BlockAddress *addr)
+{
+	if((x / 16) != x_pos || (z_pos / 16) != z_pos)
+		// not in this chunk.
+		return false;
+	
+	*addr = BlockAddress(x, y, z);
+	
+	return true;
+}
 
+bool Chunk::getBlockInfo(const BlockAddress &addr, BlockInfo *info)
+{
+	if(addr.section < 0 || addr.section > MAX_SECTIONS)
+		return false;
+	
+	ChunkSection *section = sections[addr.section];
+	
+	return section->getBlockInfo(addr, info);
+}
+
+BlockState &Chunk::getBlockState(const BlockInfo &info)
+{
+	if(
+}

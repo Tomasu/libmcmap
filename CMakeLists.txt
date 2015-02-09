@@ -9,6 +9,7 @@ set(LIBMCMAP_VERSION
   
 find_package(ZLIB REQUIRED)
 find_package(LibNBT REQUIRED)
+find_package(LibIOAccess REQUIRED)
 
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
    add_definitions(-DDEBUG -O0 -ggdb3)
@@ -18,7 +19,7 @@ endif()
 
 add_definitions(-fPIC -Wextra -Wall -pipe -std=gnu++11)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${ZLIB_INCLUDE_DIRS} ${LIBNBT_INCLUDE_DIRS})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${ZLIB_INCLUDE_DIRS} ${LIBNBT_INCLUDE_DIRS} ${LIBIOACCESS_INCLUDE_DIRS})
 
 # Offer the user the choice of overriding the installation directories
 
@@ -66,7 +67,7 @@ set(MCMAP_SOURCES
 )
 
 add_library(mcmap SHARED ${MCMAP_SOURCES} ${MCMAP_HEADERS})
-target_link_libraries(mcmap ${ZLIB_LIBRARIES} ${LIBNBT_LIBRARIES})
+target_link_libraries(mcmap ${ZLIB_LIBRARIES} ${LIBNBT_LIBRARIES} ${LIBIOACCESS_LIBRARIES})
 
 set_target_properties(mcmap PROPERTIES PUBLIC_HEADER "${MCMAP_HEADERS}")
 

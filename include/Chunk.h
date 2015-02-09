@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <utility>
 
+#include "Block.h"
+
 class NBT_Tag_Compound;
 class NBT_File;
 
@@ -11,6 +13,8 @@ class Chunk
 {
 	public:
 		typedef std::pair<int32_t, int32_t> Key;
+		
+		static const int32_t MAX_SECTIONS = 16;
 		
 		Chunk(int t, int x, int z, int co, int cl);
 		~Chunk();
@@ -32,6 +36,10 @@ class Chunk
       const Key key() const { return Key(x_pos, z_pos); }
       static const Key key(int32_t x, int32_t z) { return Key(x, z); }
       
+      bool getBlockAddress(int32_t x, int32_t y, int32_t z, BlockAddress *addr);
+      bool getBlockInfo(const BlockAddress &addr, BlockInfo *info);
+		BlockState &getBlockState(const BlockInfo &info);
+      
 	private:
 		int x_pos;
 		int z_pos;
@@ -41,6 +49,8 @@ class Chunk
 		uint32_t chunk_len;
 		
       NBT_Tag_Compound *nbt_data;
+		
+		ChunkSection *sections[MAX_SECTIONS];
 };
 
 #endif /* CHUNK_H_GUARD */
