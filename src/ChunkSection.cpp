@@ -1,4 +1,5 @@
 #include "ChunkSection.h"
+#include "BlockInfo.h"
 
 bool ChunkSection::init(int32_t idx, NBT_Tag_Compound *section) 
 {
@@ -38,7 +39,7 @@ bool ChunkSection::getBlockInfo(const BlockAddress &addr, BlockInfo *info)
 	int32_t bid = BlockInfo::ID(block_ids_nbt->data(), add_data, addr.idx);
 	int32_t sid = BlockInfo::SID(sub_data, addr.idx);
 	
-	*info = BlockAddress(addr, bid, sid);
+	*info = BlockInfo(addr, bid, sid);
 	
 	return true;
 }

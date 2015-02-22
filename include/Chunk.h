@@ -6,6 +6,12 @@
 
 #include "Block.h"
 
+class BlockInfo;
+class BlockAddress;
+class BlockState;
+
+class ChunkSection;
+
 class NBT_Tag_Compound;
 class NBT_File;
 
@@ -38,7 +44,9 @@ class Chunk
       
       bool getBlockAddress(int32_t x, int32_t y, int32_t z, BlockAddress *addr);
       bool getBlockInfo(const BlockAddress &addr, BlockInfo *info);
-		BlockState &getBlockState(const BlockInfo &info);
+		
+		// can't put this here, needs to be in Level i think
+		//BlockState &getBlockState(const BlockInfo &info);
       
 	private:
 		int x_pos;

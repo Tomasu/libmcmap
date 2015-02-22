@@ -4,20 +4,20 @@
 #include <string>
 #include <type_traits>
 #include <cstring>
-#include <cmemory>
+#include <memory.h>
 #include <cstdlib>
 
 template<typename FROM, typename TO, class Enable = void>
 struct BlockStateValueConvert;
 
 template<typename FROM, typename TO>
-struct BlockStateValueConvert<FROM, TO, typename std::enable_if<std::is_same<FROM, TO>::type>
+struct BlockStateValueConvert<FROM, TO, typename std::enable_if<std::is_same<FROM, TO>::type>::type>
 {
 	static TO &to(const FROM &from)
 	{
 		return from;
 	}
-}
+};
 
 template<typename FROM, typename TO>
 struct BlockStateValueConvert<FROM, TO, typename std::enable_if<std::is_integral<FROM>::value && std::is_floating_point<TO>::value>::type>
@@ -29,7 +29,7 @@ struct BlockStateValueConvert<FROM, TO, typename std::enable_if<std::is_integral
 };
 
 template<typename FROM, typename TO>
-struct BlockStateValueConvert<FROM, TO, typename std::enable_if<std::is_floating_point<FROM>::value && std::is_integral<TO>>::type>
+struct BlockStateValueConvert<FROM, TO, typename std::enable_if<std::is_floating_point<FROM>::value && std::is_integral<TO>::value>::type>
 {
 	static TO to(const FROM &from)
 	{
@@ -44,7 +44,7 @@ struct BlockStateValueConvert<std::string, float>
 	{
 		return strtof(from.c_str(), nullptr);
 	}
-}
+};
 
 template<>
 struct BlockStateValueConvert<std::string, int32_t>
@@ -53,14 +53,14 @@ struct BlockStateValueConvert<std::string, int32_t>
 	{
 		return strtol(from.c_str(), nullptr, 10);
 	}
-}
+};
 
 template<>
 struct BlockStateValueConvert<float, std::string>
 {
 	static std::string to(const float &from)
 	{
-		const char buff[128];
+		char buff[128];
 		memset(buff, 0, sizeof(buff));
 		
 		snprintf(buff, sizeof(buff)-1, "%f", from);
@@ -74,12 +74,39 @@ struct BlockStateValueConvert<int32_t, std::string>
 {
 	static std::string to(const float &from)
 	{
-		const char buff[128];
+		char buff[128];
 		memset(buff, 0, sizeof(buff));
 		
 		snprintf(buff, sizeof(buff)-1, "%d", from);
 		
 		return std::string(buff);
+	}
+};
+
+template<>
+struct BlockStateValueConvert<void, int32_t>
+{
+	static int32_t to()
+	{
+		return 0;
+	}
+};
+
+template<>
+struct BlockStateValueConvert<void, float>
+{
+	static float to()
+	{
+		return 0.0;
+	}
+};
+
+template<>
+struct BlockStateValueConvert<void, std::string>
+{
+	static std::string to()
+	{
+		return "(none)";
 	}
 };
 

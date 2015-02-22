@@ -10,8 +10,8 @@
 class BlockState
 {
 	public:
-		BlockState() : name("missing"), valid_(false) { }
-		BlockState(const std::string &n) : name_(n), valid(true) { }
+		BlockState() : name_("missing"), valid_(false) { }
+		BlockState(const std::string &n) : name_(n), valid_(true) { }
 		~BlockState() { }
 		
 		const std::string &name() { return name_; }
@@ -32,7 +32,7 @@ class BlockState
 			if(it != data.end())
 				return it->second;
 			
-			return T();
+			return BlockStateValue::NullValue;
 		}
 		
 		const BlockStateValue &operator[](const std::string &k) const; // rhs

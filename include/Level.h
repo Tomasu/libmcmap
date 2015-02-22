@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
+#include "rapidjson/document.h"
 
 class NBT;
 class NBT_Tag_Compound;

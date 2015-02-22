@@ -16,7 +16,7 @@ class ChunkSection
 		bool init(int32_t id, NBT_Tag_Compound *section);
 		
 		int32_t y() const { return y_off; }
-		int32_t getIdx() const { return idx_; }
+		int32_t getIdx() const { return idx; }
 		
 		bool getBlockInfo(const BlockAddress &addr, BlockInfo *info) const;
 		

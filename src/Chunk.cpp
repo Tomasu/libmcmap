@@ -9,6 +9,10 @@
 #include "NBT_Debug.h"
 #include "NBT_File.h"
 
+#include "ChunkSection.h"
+#include "BlockAddress.h"
+#include "BlockInfo.h"
+
 #include <zlib.h>
 
 Chunk::Chunk(int t, int x, int z, int co, int cl) : x_pos(x), z_pos(z), timestamp(t), chunk_offset(co), chunk_len(cl), nbt_data(0)
@@ -89,11 +93,11 @@ bool Chunk::load(NBT_File *fh)
 			goto chunk_load_bail;
 		}
 		
-		for(uint32_t section_id = 0; section_id < sections_tag.count(); section_id++)
+		for(uint32_t section_id = 0; section_id < sections_tag->count(); section_id++)
 		{
-			NBT_Tag_Compound *section_tag = (NBT_Tag_Compound*)section_tag.itemAt(section_id);
+			NBT_Tag_Compound *section_tag = (NBT_Tag_Compound*)section_tag->childAt(section_id);
 			
-			ChunkSection *rcs = new RendererChunkSection();
+			ChunkSection *rcs = new ChunkSection();
 			if(!rcs->init(section_id, section_tag))
 			{
 				NBT_Debug("failed to initialize ChunkSection(%i)", section_id);
@@ -172,7 +176,7 @@ bool Chunk::getBlockInfo(const BlockAddress &addr, BlockInfo *info)
 	return section->getBlockInfo(addr, info);
 }
 
-BlockState &Chunk::getBlockState(const BlockInfo &info)
-{
-	if(
-}
+//BlockState &Chunk::getBlockState(const BlockInfo &info)
+//{
+//	return 
+//}

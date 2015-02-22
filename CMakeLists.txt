@@ -19,7 +19,7 @@ endif()
 
 add_definitions(-fPIC -Wextra -Wall -pipe -std=gnu++11)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${ZLIB_INCLUDE_DIRS} ${LIBNBT_INCLUDE_DIRS} ${LIBIOACCESS_INCLUDE_DIRS})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/vendor/rapidjson/include ${ZLIB_INCLUDE_DIRS} ${LIBNBT_INCLUDE_DIRS} ${LIBIOACCESS_INCLUDE_DIRS})
 
 # Offer the user the choice of overriding the installation directories
 
