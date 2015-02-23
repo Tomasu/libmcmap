@@ -157,7 +157,7 @@ Chunk* Map::getChunk(int32_t x, int32_t z)
 		return nullptr;
 	}
 	
-	return region->getChunkAbs(x, z);
+	return region->getChunk(x, z);
 }
 
 

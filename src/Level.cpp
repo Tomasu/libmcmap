@@ -44,6 +44,29 @@ bool Level::load(const std::string &path)
 	return true;
 }
 
+Map *Level::getMap(int id)
+{
+	for(auto map: maps_)
+	{
+		if(map->dimension() == id)
+			return map;
+	}
+	
+	return nullptr;
+}
+
+Map *Level::getMap(const std::string &name)
+{
+	for(auto map: maps_)
+	{
+		if(map->mapName() == name)
+			return map;
+	}
+	
+	return nullptr;
+}
+
+
 struct DirPair
 {
 	DirPair(const std::string &name, const std::string &path, DIR *dh) : name(name), path(path), dh(dh) { }

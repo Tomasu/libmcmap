@@ -21,6 +21,9 @@ class Level
 		
 		std::string levelName();
 		
+		Map *getMap(const std::string &name);
+		Map *getMap(int id);
+		
 		std::vector<Map *> &maps() { return maps_; }
 		std::vector<Player *> &players() { return players_; }
 		std::vector<Player *> dimensionPlayers(int32_t dim);

@@ -381,7 +381,7 @@ std::vector< Chunk* > MCRegion::chunks()
 	return vec;
 }
 
-Chunk* MCRegion::getChunkAbs(int32_t x, int32_t z)
+Chunk* MCRegion::getChunk(int32_t x, int32_t z)
 {
 	if(!containsChunk(x, z))
 	{
@@ -389,11 +389,6 @@ Chunk* MCRegion::getChunkAbs(int32_t x, int32_t z)
 		return nullptr;
 	}
 	
-	return getChunkRel(x, z);
-}
-
-Chunk* MCRegion::getChunkRel(int32_t x, int32_t z)
-{
 	auto it = data.find(Chunk::Key(x, z));
 	if(it == data.end() || it->second == nullptr)
 	{

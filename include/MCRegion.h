@@ -45,8 +45,7 @@ class MCRegion
 		
 		Key key() { return Key(x_pos, z_pos); }
 		
-		Chunk *getChunkRel(int32_t x, int32_t z);
-		Chunk *getChunkAbs(int32_t x, int32_t z);
+		Chunk *getChunk(int32_t x, int32_t z);
 		
 	private:
 		int x_pos;

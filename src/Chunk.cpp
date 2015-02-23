@@ -176,7 +176,3 @@ bool Chunk::getBlockInfo(const BlockAddress &addr, BlockInfo *info)
 	return section->getBlockInfo(addr, info);
 }
 
-//BlockState &Chunk::getBlockState(const BlockInfo &info)
-//{
-//	return 
-//}
