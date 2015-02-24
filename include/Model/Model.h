@@ -7,8 +7,6 @@
 #include <vector>
 #include <string>
 
-//#include "MCModel/Variant.h"
-
 #include "Util.h"
 #include "NBT_Debug.h"
 
@@ -16,7 +14,7 @@
 
 class ResourceManager;
 
-namespace MCModel {
+namespace Model {
 	struct Variant;
 
 	class Model
@@ -25,7 +23,7 @@ namespace MCModel {
 			Model();
 			~Model();
 			
-			static Model *Create(const std::string &name, ResourceManager *rm);
+			static Model *Create(const std::string &name);
 
 			const std::vector<Variant *> &getVariants() { return variants_; }
 			
@@ -35,9 +33,8 @@ namespace MCModel {
 			std::string name_;
 			std::vector<Variant *> variants_;
 			
-			bool loadBlockstate(const std::string &name, ResourceManager *rm);
-			bool loadVariant(const std::string &key, rapidjson::Value &v, ResourceManager *rm);
-			
+			bool loadBlockstate(const std::string &name);
+			bool loadVariant(const std::string &key, rapidjson::Value &v);
 	};
 }
 

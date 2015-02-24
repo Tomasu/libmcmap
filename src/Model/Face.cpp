@@ -1,17 +1,12 @@
-#include "MCModel/Face.h"
-#include "MCModel/Variant.h"
-
-#include "Resource/Atlas.h"
-#include "Resource/Manager.h"
+#include "Model/Face.h"
+#include "Model/Variant.h"
 
 #include "NBT_Debug.h"
 #include "Util.h"
 
-#include <allegro5/allegro.h>
-
-namespace MCModel {
+namespace Model {
 	
-bool Face::load(Variant *variant, FaceDirection dir, rapidjson::Value &v, ResourceManager *rm)
+bool Face::load(Variant *variant, FaceDirection dir, rapidjson::Value &v)
 {
 	if(v.IsNull() || !v.IsObject())
 		return false;
@@ -24,7 +19,7 @@ bool Face::load(Variant *variant, FaceDirection dir, rapidjson::Value &v, Resour
 	uv.f3 = 1.0;
 	uv.f4 = 1.0;
 		
-	Atlas *atlas = rm->getAtlas();
+	// Atlas *atlas = rm->getAtlas();
 	
 	cull = CULL_NONE;
 	
@@ -82,6 +77,8 @@ bool Face::load(Variant *variant, FaceDirection dir, rapidjson::Value &v, Resour
 		uv.f4 = 1.0;
 	}
 	
+	// FIXME: gotta do something about this shit
+	/*
 	if(rotation != 0.0)
 	{
 		ALLEGRO_TRANSFORM rot;
@@ -120,6 +117,7 @@ bool Face::load(Variant *variant, FaceDirection dir, rapidjson::Value &v, Resour
 		uv.f3 = 1.0 * atlas->xfact();
 		uv.f4 = 1.0 * atlas->yfact();
 	}
+	*/
 	
 	return true;
 }

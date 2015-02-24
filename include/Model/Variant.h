@@ -6,9 +6,7 @@
 
 #include "rapidjson/document.h"
 
-class ResourceManager;
-
-namespace MCModel {
+namespace Model {
 
 	struct Element;
 
@@ -25,10 +23,10 @@ namespace MCModel {
 			std::vector<Element *> elements_;
 			std::map<std::string, std::string> state_map_;
 			
-			bool load(const std::string &k, rapidjson::Value &v, ResourceManager *rm);
+			bool load(const std::string &k, rapidjson::Value &v);
 			
-			bool loadModel(const std::string &name, ResourceManager *rm);
-			bool loadElements(rapidjson::Value &v, ResourceManager *rm);
+			bool loadModel(const std::string &name);
+			bool loadElements(rapidjson::Value &v);
 			bool loadTextures(rapidjson::Value &v);
 			
 			std::string lookupTextureKey(const std::string &s);

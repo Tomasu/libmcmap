@@ -1,14 +1,10 @@
-#include "MCModel/Element.h"
-#include "MCModel/Variant.h"
+#include "Model/Element.h"
+#include "Model/Variant.h"
+#include "NBT_Debug.h"
 
-#include "Resource/Manager.h"
+namespace Model {
 
-#include <allegro5/allegro.h>
-#include "al_ext.h"
-
-namespace MCModel {
-
-bool Element::loadFaces(Variant *variant, rapidjson::Value &v, ResourceManager *rm)
+bool Element::loadFaces(Variant *variant, rapidjson::Value &v)
 {
 	if(v.IsNull() || !v.IsObject())
 	{
@@ -21,48 +17,49 @@ bool Element::loadFaces(Variant *variant, rapidjson::Value &v, ResourceManager *
 	{
 		if(it->name == "up")
 		{
-			if(!faces[Face::FACE_UP].load(variant, Face::FACE_UP, it->value, rm))
+			if(!faces[Face::FACE_UP].load(variant, Face::FACE_UP, it->value))
 				return false;
 			
 			face_count++;
 		}
 		else if(it->name == "down")
 		{
-			if(!faces[Face::FACE_DOWN].load(variant, Face::FACE_DOWN, it->value, rm))
+			if(!faces[Face::FACE_DOWN].load(variant, Face::FACE_DOWN, it->value))
 				return false;
 			
 			face_count++;
 		}
 		else if(it->name == "north")
 		{
-			if(!faces[Face::FACE_NORTH].load(variant, Face::FACE_NORTH, it->value, rm))
+			if(!faces[Face::FACE_NORTH].load(variant, Face::FACE_NORTH, it->value))
 				return false;
 			
 			face_count++;
 		}
 		else if(it->name == "east")
 		{
-			if(!faces[Face::FACE_EAST].load(variant, Face::FACE_EAST, it->value, rm))
+			if(!faces[Face::FACE_EAST].load(variant, Face::FACE_EAST, it->value))
 				return false;
 			
 			face_count++;
 		}
 		else if(it->name == "south")
 		{
-			if(!faces[Face::FACE_SOUTH].load(variant, Face::FACE_SOUTH, it->value, rm))
+			if(!faces[Face::FACE_SOUTH].load(variant, Face::FACE_SOUTH, it->value))
 				return false;
 			
 			face_count++;
 		}
 		else if(it->name == "west")
 		{
-			if(!faces[Face::FACE_WEST].load(variant, Face::FACE_WEST, it->value, rm))
+			if(!faces[Face::FACE_WEST].load(variant, Face::FACE_WEST, it->value))
 				return false;
 			
 			face_count++;
 		}
 	}
 	
+	// FIXME: needs to be handled properly...
 	if(rotation.shouldRotate())
 		rotate(); // rotates from/to coords.
 	
@@ -159,6 +156,8 @@ bool Element::loadFaces(Variant *variant, rapidjson::Value &v, ResourceManager *
 
 void Element::rotate()
 {
+	// FIXME: don't use allegro here, or somehow delay vertex generation till we have a chance to 
+	/*
 	ALLEGRO_TRANSFORM rot;
 	al_identity_transform(&rot);
 	al_translate_transform_3d(&rot, -(rotation.origin.f1/2), -(rotation.origin.f2/2), -(rotation.origin.f3/2));
@@ -174,9 +173,10 @@ void Element::rotate()
 	
 	al_transform_coordinates_3d(&rot, &(from.f1), &(from.f2), &(from.f3));
 	al_transform_coordinates_3d(&rot, &(to.f1), &(to.f2), &(to.f3));
+	*/
 }
 
-bool Element::load(Variant *variant, rapidjson::Value &v, ResourceManager *rm)
+bool Element::load(Variant *variant, rapidjson::Value &v)
 {
 	if(v.IsNull() || !v.IsObject())
 	{
@@ -207,7 +207,7 @@ bool Element::load(Variant *variant, rapidjson::Value &v, ResourceManager *rm)
 		}
 		else if(it->name == "faces")
 		{
-			if(!loadFaces(variant, it->value, rm))
+			if(!loadFaces(variant, it->value))
 			{
 				NBT_Debug("failed to load faces");
 				return false;

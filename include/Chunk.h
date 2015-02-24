@@ -13,6 +13,7 @@ class BlockState;
 class ChunkSection;
 
 class NBT_Tag_Compound;
+class NBT_Tag_Byte_Array;
 class NBT_File;
 
 class Chunk
@@ -54,6 +55,7 @@ class Chunk
 		uint32_t chunk_len;
 		
       NBT_Tag_Compound *nbt_data;
+		NBT_Tag_Byte_Array *biome_data;
 		
 		ChunkSection *sections[MAX_SECTIONS];
 };

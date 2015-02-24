@@ -1,11 +1,13 @@
 #ifndef CHUNK_SECTION_H_GUARD
 #define CHUNK_SECTION_H_GUARD
 
+#include <stdint.h>
+
 struct BlockInfo;
 struct BlockAddress;
 
 class NBT_Tag_Compound;
-class NBT_Tag_ByteArray;
+class NBT_Tag_Byte_Array;
 
 class ChunkSection
 {
@@ -24,9 +26,9 @@ class ChunkSection
 		int32_t idx;
 		int32_t y_off;
 		
-		NBT_Tag_ByteArray *block_ids_nbt;
-		NBT_Tag_ByteArray *block_add_nbt;
-		NBT_Tag_ByteArray *block_data_nbt;
+		NBT_Tag_Byte_Array *block_ids_nbt;
+		NBT_Tag_Byte_Array *block_add_nbt;
+		NBT_Tag_Byte_Array *block_data_nbt;
 		
 		NBT_Tag_Compound *nbt;
 };

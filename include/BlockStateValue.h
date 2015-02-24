@@ -69,23 +69,23 @@ class BlockStateValue
 					return BlockStateValueConvert<void, AS>::to();
 					
 				case TYPE_STRING:
-					return BlockStateValueConvert<std::string, AS>::to();
+					return BlockStateValueConvert<std::string, AS>::to(data.sv);
 			}
 			
 			return BlockStateValueConvert<void, AS>::to();
 		}
 		
-		float asFloat()
+		float asFloat() const
 		{
 			return this->as<float>();
 		}
 		
-		int32_t asInt()
+		int32_t asInt() const
 		{
 			return this->as<int32_t>();
 		}
 		
-		std::string asString()
+		std::string asString() const
 		{
 			return this->as<std::string>();
 		}
@@ -94,6 +94,26 @@ class BlockStateValue
 		operator int32_t() const { return this->as<int32_t>(); }
 		operator float() const { return this->as<float>(); }
 		operator std::string() const { return this->as<std::string>(); }
+		
+		bool operator==(const BlockStateValue &v)
+		{
+			switch(type)
+			{
+				case TYPE_FLOAT:
+					return data.fv == v.asFloat();
+					
+				case TYPE_INT:
+					return data.iv == v.asInt();
+					
+				case TYPE_NONE:
+					return type == v.type;
+					
+				case TYPE_STRING:
+					return data.sv == v.asString();
+			}
+			
+			return false;
+		}
 		
 	private:
 		Type type;
@@ -109,6 +129,30 @@ class BlockStateValue
 			
 			std::string sv;
 		} data;
+};
+
+template<>
+class BlockStateValueMapType<BlockStateValue::TYPE_FLOAT>
+{
+	typedef float type;
+};
+
+template<>
+class BlockStateValueMapType<BlockStateValue::TYPE_INT>
+{
+	typedef int32_t type;
+};
+
+template<>
+class BlockStateValueMapType<BlockStateValue::TYPE_NONE>
+{
+	typedef void type;
+};
+
+template<>
+class BlockStateValueMapType<BlockStateValue::TYPE_STRING>
+{
+	typedef std::string type;
 };
 
 #endif /* BLOCK_STATE_VALUE_H_GUARD */

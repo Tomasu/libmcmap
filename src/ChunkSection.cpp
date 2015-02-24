@@ -1,6 +1,10 @@
 #include "ChunkSection.h"
 #include "BlockInfo.h"
 
+#include "NBT_Debug.h"
+#include "NBT_Tag_Compound.h"
+#include "NBT_Tag_Byte_Array.h"
+
 bool ChunkSection::init(int32_t idx, NBT_Tag_Compound *section) 
 {
 	nbt = section;
@@ -12,26 +16,26 @@ bool ChunkSection::init(int32_t idx, NBT_Tag_Compound *section)
 	block_ids_nbt = nbt->getByteArray("Blocks");
 	if(!block_ids_nbt)
 	{
-		NBT_Debug("missing Blocks data in section %i", id);
+		NBT_Debug("missing Blocks data in section %i", idx);
 		return false;
 	}
 	
 	block_add_nbt = nbt->getByteArray("Add");
 	if(!block_add_nbt)
 	{
-		NBT_Debug("missing Add data in section %i", id);
+		NBT_Debug("missing Add data in section %i", idx);
 	}
 	
 	block_data_nbt = nbt->getByteArray("Data");
 	if(!block_data_nbt)
 	{
-		NBT_Debug("missing Data data in section %i", id);
+		NBT_Debug("missing Data data in section %i", idx);
 	}
 	
 	return true;
 }
 
-bool ChunkSection::getBlockInfo(const BlockAddress &addr, BlockInfo *info)
+bool ChunkSection::getBlockInfo(const BlockAddress &addr, BlockInfo *info) const
 {
 	uint8_t *add_data = block_add_nbt ? block_add_nbt->data() : nullptr;
 	uint8_t *sub_data = block_data_nbt ? block_data_nbt->data() : nullptr;
@@ -39,7 +43,7 @@ bool ChunkSection::getBlockInfo(const BlockAddress &addr, BlockInfo *info)
 	int32_t bid = BlockInfo::ID(block_ids_nbt->data(), add_data, addr.idx);
 	int32_t sid = BlockInfo::SID(sub_data, addr.idx);
 	
-	*info = BlockInfo(addr, bid, sid);
+	*info = BlockInfo(addr, bid, sid, BIOME_UNCALCULATED);
 	
 	return true;
 }

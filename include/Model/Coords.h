@@ -3,7 +3,7 @@
 
 #include "rapidjson/document.h"
 
-namespace MCModel {
+namespace Model {
 	
 struct Coord3f {
 	float f1, f2, f3;

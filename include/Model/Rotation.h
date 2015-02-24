@@ -3,9 +3,9 @@
 
 #include "rapidjson/document.h"
 
-#include "MCModel/Coords.h"
+#include "Model/Coords.h"
 
-namespace MCModel {
+namespace Model {
 	
 	struct Rotation {
 		enum Axis {

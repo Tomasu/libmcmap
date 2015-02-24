@@ -1,9 +1,9 @@
 #ifndef MCMODEL_ELEMENT_H_GUARD
 #define MCMODEL_ELEMENT_H_GUARD
 
-#include "MCModel/Coords.h"
-#include "MCModel/Rotation.h"
-#include "MCModel/Face.h"
+#include "Model/Coords.h"
+#include "Model/Rotation.h"
+#include "Model/Face.h"
 
 #include "CustomVertex.h"
 
@@ -11,7 +11,7 @@
 
 class ResourceManager;
 
-namespace MCModel {
+namespace Model {
 
 struct Variant;
 
@@ -60,8 +60,8 @@ struct Element {
 		uint32_t vidx;
 		CUSTOM_VERTEX *vertices;
 		
-		bool loadFaces(Variant *variant, rapidjson::Value &v, ResourceManager *rm);
-		bool load(Variant *variant, rapidjson::Value &v, ResourceManager *rm);
+		bool loadFaces(Variant *variant, rapidjson::Value &v);
+		bool load(Variant *variant, rapidjson::Value &v);
 		
 		void rotate();
 };

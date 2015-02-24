@@ -11,9 +11,9 @@ template<typename FROM, typename TO, class Enable = void>
 struct BlockStateValueConvert;
 
 template<typename FROM, typename TO>
-struct BlockStateValueConvert<FROM, TO, typename std::enable_if<std::is_same<FROM, TO>::type>::type>
+struct BlockStateValueConvert<FROM, TO, typename std::enable_if<std::is_same<FROM, TO>::value>::type>
 {
-	static TO &to(const FROM &from)
+	static const TO &to(const FROM &from)
 	{
 		return from;
 	}
@@ -22,7 +22,7 @@ struct BlockStateValueConvert<FROM, TO, typename std::enable_if<std::is_same<FRO
 template<typename FROM, typename TO>
 struct BlockStateValueConvert<FROM, TO, typename std::enable_if<std::is_integral<FROM>::value && std::is_floating_point<TO>::value>::type>
 {
-	static TO to(const FROM &from)
+	static const TO to(const FROM &from)
 	{
 		return (TO)from;
 	}
@@ -31,7 +31,7 @@ struct BlockStateValueConvert<FROM, TO, typename std::enable_if<std::is_integral
 template<typename FROM, typename TO>
 struct BlockStateValueConvert<FROM, TO, typename std::enable_if<std::is_floating_point<FROM>::value && std::is_integral<TO>::value>::type>
 {
-	static TO to(const FROM &from)
+	static const TO to(const FROM &from)
 	{
 		return (TO)from;
 	}
@@ -58,7 +58,7 @@ struct BlockStateValueConvert<std::string, int32_t>
 template<>
 struct BlockStateValueConvert<float, std::string>
 {
-	static std::string to(const float &from)
+	static const std::string to(const float &from)
 	{
 		char buff[128];
 		memset(buff, 0, sizeof(buff));
@@ -72,12 +72,12 @@ struct BlockStateValueConvert<float, std::string>
 template<>
 struct BlockStateValueConvert<int32_t, std::string>
 {
-	static std::string to(const float &from)
+	static const std::string to(const float &from)
 	{
 		char buff[128];
 		memset(buff, 0, sizeof(buff));
 		
-		snprintf(buff, sizeof(buff)-1, "%d", from);
+		snprintf(buff, sizeof(buff)-1, "%f", from);
 		
 		return std::string(buff);
 	}
@@ -104,7 +104,7 @@ struct BlockStateValueConvert<void, float>
 template<>
 struct BlockStateValueConvert<void, std::string>
 {
-	static std::string to()
+	static const std::string to()
 	{
 		return "(none)";
 	}

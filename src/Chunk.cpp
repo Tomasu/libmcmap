@@ -8,6 +8,7 @@
 #include "NBT.h"
 #include "NBT_Debug.h"
 #include "NBT_File.h"
+#include <NBT_Tag_Byte_Array.h>
 
 #include "ChunkSection.h"
 #include "BlockAddress.h"
@@ -108,6 +109,7 @@ bool Chunk::load(NBT_File *fh)
 			sections[rcs->y()] = rcs;
 		}
 		
+		biome_data = nbt_data->getByteArray("Biomes");
 	}
 	
 	//NBT_Debug("end");
@@ -120,6 +122,8 @@ chunk_load_bail:
 	
 	if(nbt_data)
 		delete nbt_data;
+	
+	return false;
 }
 
 bool Chunk::save(NBT_File *fh)
@@ -173,6 +177,17 @@ bool Chunk::getBlockInfo(const BlockAddress &addr, BlockInfo *info)
 	
 	ChunkSection *section = sections[addr.section];
 	
-	return section->getBlockInfo(addr, info);
+	bool ret = section->getBlockInfo(addr, info);
+	if(!ret)
+		return false;
+	
+	if(biome_data)
+	{
+		uint8_t *data = biome_data->data();
+		uint8_t idx = addr.lx * 16 + addr.lz;
+		info->biome = data[idx];
+	}
+	
+	return true;
 }
 

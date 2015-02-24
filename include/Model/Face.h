@@ -2,13 +2,10 @@
 #define MCMODEL_FACE_H_GUARD
 
 #include "rapidjson/document.h"
-#include "Resource/Resource.h"
 
-#include "MCModel/Coords.h"
+#include "Model/Coords.h"
 
-class ResourceManager;
-
-namespace MCModel {
+namespace Model {
 
 struct Variant;
 
@@ -37,7 +34,6 @@ struct Face {
 	FaceDirection direction;
 	Coord4f uv;
 	std::string texname;
-	Resource::ID tex_res;
 	uint32_t tex_page;
 	CullFace cull;
 	int32_t tintindex;
@@ -46,7 +42,7 @@ struct Face {
 	Face() : direction(FACE_NONE), uv(), texname(), cull(CULL_NONE), tintindex(-1) { }
 	// TODO: putBitmap for texture?
 	
-	bool load(Variant *variant, FaceDirection dir, rapidjson::Value &v, ResourceManager *rm);
+	bool load(Variant *variant, FaceDirection dir, rapidjson::Value &v);
 };
 
 }

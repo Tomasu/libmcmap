@@ -1,17 +1,14 @@
-#include "MCModel/Variant.h"
-#include "MCModel/Element.h"
-
-#include "Resource/Manager.h"
-
-#include <allegro5/allegro.h>
-#include "al_ext.h"
+#include "Model/Variant.h"
+#include "Model/Element.h"
 
 #include "NBT_Debug.h"
 #include "Util.h"
 
-namespace MCModel {
+#include "Minecraft.h"
+
+namespace Model {
 	
-	bool Variant::load(const std::string &k, rapidjson::Value &v, ResourceManager *rm)
+	bool Variant::load(const std::string &k, rapidjson::Value &v)
 	{
 		if(v.IsNull() || !v.IsObject())
 		{
@@ -71,7 +68,7 @@ namespace MCModel {
 		
 		model = "block/" + model;
 		
-		if(!loadModel(model, rm))
+		if(!loadModel(model))
 		{
 			NBT_Debug("failed to load variant model?");
 			return false;
@@ -87,7 +84,7 @@ namespace MCModel {
 		return texture_map_[s];
 	}
 
-	bool Variant::loadElements(rapidjson::Value &v, ResourceManager *rm)
+	bool Variant::loadElements(rapidjson::Value &v)
 	{
 		if(v.IsNull() || !v.IsArray())
 		{
@@ -98,7 +95,7 @@ namespace MCModel {
 		for(auto it = v.Begin(); it != v.End(); it++)
 		{
 			Element *element = new Element;
-			if(!element->load(this, *it, rm))
+			if(!element->load(this, *it))
 				return false;
 			
 			elements_.emplace(elements_.end(), element);
@@ -125,9 +122,9 @@ namespace MCModel {
 		return true;
 	}
 
-	bool Variant::loadModel(const std::string &name, ResourceManager* rm)
+	bool Variant::loadModel(const std::string &name)
 	{
-		rapidjson::Document *doc = rm->getModelJson(name);
+		rapidjson::Document *doc = Minecraft::LoadJson(std::string("assets/minecraft/models/block/") + name + ".json");
 		if(!doc)
 		{
 			NBT_Debug("failed to get model json: %s", name.c_str());
@@ -149,7 +146,7 @@ namespace MCModel {
 			//NBT_Debug("member: %s:%i", v->name.GetString(), v->value.GetType());
 			if(v->name == "elements")
 			{
-				if(!loadElements(v->value, rm))
+				if(!loadElements(v->value))
 				{
 					NBT_Debug("failed to load elements :(");
 					return false;
@@ -175,7 +172,7 @@ namespace MCModel {
 		if(parent_name)
 		{
 			//NBT_Debug("load parent %s", parent_name);
-			if(!loadModel(parent_name, rm))
+			if(!loadModel(parent_name))
 			{
 				NBT_Debug("failed to load parent %s", parent_name);
 				return false;
@@ -188,6 +185,8 @@ namespace MCModel {
 
 	void Variant::rotate()
 	{
+		// TODO: needs to not use allegro :( or be moved somehow
+		/*
 		if(x == 0.0 && y == 0.0)
 			return;
 		
@@ -220,6 +219,7 @@ namespace MCModel {
 				al_transform_coordinates_3d(&rot, &(v.pos.f1), &(v.pos.f2), &(v.pos.f3));
 			}
 		}
+		*/
 	}
 	
 	void Variant::dump()

@@ -1,12 +1,11 @@
-#include "MCModel/Model.h"
-#include "MCModel/Variant.h"
-
-#include "Resource/Manager.h"
+#include "Model/Model.h"
+#include "Model/Variant.h"
 
 #ifdef Bool
 #undef Bool
 #endif
 
+#include "Minecraft.h"
 #include "rapidjson/document.h"
 #include "NBT_Debug.h"
 
@@ -28,7 +27,7 @@
  * 
  */
 
-namespace MCModel {
+namespace Model {
 
 	Model::Model()
 	{ }
@@ -41,12 +40,12 @@ namespace MCModel {
 		}
 	}
 
-	bool Model::loadVariant(const std::string &key, rapidjson::Value &v, ResourceManager *rm)
+	bool Model::loadVariant(const std::string &key, rapidjson::Value &v)
 	{
 		Variant *variant = new Variant;
 		
 		NBT_Debug("load Variant: %s", key.c_str());
-		if(!variant->load(key, v, rm))
+		if(!variant->load(key, v))
 			return false;
 		
 		variants_.push_back(variant);
@@ -54,9 +53,9 @@ namespace MCModel {
 		return true;
 	}
 
-	bool Model::loadBlockstate(const std::string &name, ResourceManager *rm)
+	bool Model::loadBlockstate(const std::string &name)
 	{
-		rapidjson::Document *doc = rm->getBlockstateJson(name);
+		rapidjson::Document *doc = Minecraft::LoadJson(std::string("assets/minecraft/blockstates/") + name + ".json");
 		if(!doc)
 			return false;
 		
@@ -84,7 +83,7 @@ namespace MCModel {
 			
 			if(member_value.IsObject())
 			{
-				if(!loadVariant(member_key, member_value, rm))
+				if(!loadVariant(member_key, member_value))
 					continue;
 			}
 			else if(member_value.IsArray())
@@ -95,7 +94,7 @@ namespace MCModel {
 					char buff[101];
 					snprintf(buff, 100, "%i", vid);
 					vid++;
-					if(!loadVariant(buff, *it, rm))
+					if(!loadVariant(buff, *it))
 						continue;
 				}
 			}
@@ -109,11 +108,11 @@ namespace MCModel {
 
 
 
-	Model *Model::Create(const std::string &name, ResourceManager *rm)
+	Model *Model::Create(const std::string &name)
 	{
 		Model *model = new Model;
 		
-		if(!model->loadBlockstate(name, rm))
+		if(!model->loadBlockstate(name))
 		{
 			delete model;
 			return nullptr;

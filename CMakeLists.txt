@@ -47,23 +47,46 @@ endforeach()
 set(MCMAP_HEADERS
 	include/Block.h
 	include/BlockMaps.h
+	include/BlockState.h
+	include/BlockStateValue.h
+	include/BlockStateValueConvert.h
+	include/BlockAddress.h
+	include/BlockInfo.h
 	include/Chunk.h
+	include/ChunkSection.h
+	include/CustomVertex.h
 	include/Level.h
 	include/Map.h
+	include/Minecraft.h
 	include/Player.h
 	include/MCRegion.h
 	include/PairHash.h
+	include/Util.h
+	include/Model/Coords.h
+	include/Model/Element.h
+	include/Model/Face.h
+	include/Model/Model.h
+	include/Model/Rotation.h
+	include/Model/Variant.h
 )
 
 set(MCMAP_SOURCES
 	src/Block.cpp
 	src/BlockMaps.cpp
+	src/BlockState.cpp
 	src/Chunk.cpp
+	src/ChunkSection.cpp
 	src/Level.cpp
 	src/Map.cpp
+	src/Minecraft.cpp
 	src/Player.cpp
 	src/MCRegion.cpp
 	src/PairHash.cpp
+	src/Model/Model.cpp
+	src/Model/Element.cpp
+	src/Model/Face.cpp
+	src/Model/Rotation.cpp
+	src/Model/Variant.cpp
 )
 
 add_library(mcmap SHARED ${MCMAP_SOURCES} ${MCMAP_HEADERS})

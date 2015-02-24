@@ -9,4 +9,7 @@ inline uint32_t swap_uint32( uint32_t val )
     return (val << 16) | (val >> 16);
 }
 
+#include <cmath>
+#define DEG_TO_RAD(angle) ((angle) * 180.0 / M_PI)
+
 #endif /* UTIL_H_GUARD */

@@ -1,7 +1,7 @@
-#include "MCModel/Rotation.h"
+#include "Model/Rotation.h"
 #include "Util.h"
 
-namespace MCModel {
+namespace Model {
 	
 	bool Rotation::load(rapidjson::Value &v)
 	{

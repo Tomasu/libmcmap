@@ -1,38 +1,98 @@
 #include "Minecraft.h"
 
-#include <ioaccess/IOAccess.h>
+//#define _XOPEN_SOURCE 
+#include <time.h>
+
+#include <algorithm>
 
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
 
-Minecraft::Minecraft(const std::string &path)
+#include "ioaccess/IOAccess.h"
+
+#include "NBT_Debug.h"
+#include "rapidjson/error/en.h"
+#include "rapidjson/document.h"
+
+Minecraft::Minecraft()
+{ }
+
+bool Minecraft::init(const std::string& path)
 {
+	std::string loc_path = path;
 	
+	if(!loc_path.length())
+		loc_path = findBaseDir();
+	
+	if(!loc_path.length())
+		return false;
+	
+	IOAccess::StatInfo si;
+	if(!IOAccess::Stat(loc_path, &si))
+	{
+		NBT_Debug("failed to stat %s: %s", loc_path.c_str(), strerror(IOAccess::Errno()));
+		return false;
+	}
+
+	if(!si.isDir())
+	{
+		NBT_Debug("%s is not a directory", loc_path.c_str());
+		return false;
+	}
+	
+	if(!findVersions(loc_path))
+	{
+		NBT_Debug("failed to find versions for %s", loc_path.c_str());
+		return false;
+	}
+	
+	base_path = loc_path;
+	
+	return true;
 }
+
+Minecraft *Minecraft::Create(const std::string& path, const std::string &saves_path)
+{
+	Minecraft *mc = new Minecraft();
+	
+	if(!mc->init(path))
+	{
+		delete mc;
+		return nullptr;
+	}
+	
+	mc->findSaves(saves_path.length() ? saves_path : path);
+	
+	return mc;
+}
+
 
 Minecraft::~Minecraft()
 {
-	
+	NBT_Debug("We're done!");
 }
 
 bool Minecraft::autoSelectVersion()
 {
-	VersionMap::reverse_iterator it;
-	MinecraftVersion selected_version;
+	VersionMap::iterator it;
+	MinecraftVersion loc_selected_version;
+	std::string loc_selected_jarpath;
 	
-	it = version_map_.rbegin();
-	selected_version = *it;
+	it = version_map_.begin();
+
+	loc_selected_version = it->first;
+	loc_selected_jarpath = it->second;
 	
-	while(it != version_map.rend())
+	while(it != version_map_.end())
 	{
-		selected_version = it->first;
+		MinecraftVersion cur_ver = it->first;
 		std::string jar_path = it->second;
 		
-		NBT_Debug("test version %s: %s", selected_version.str().c_str(), jar_path.c_str());
+		NBT_Debug("test version %s: %s", loc_selected_version.str().c_str(), jar_path.c_str());
 		
-		// skip snapshots.
-		if(it->isSnapshot())
+		// do not auto select snapshots
+		if(cur_ver.isSnapshot())
 		{
 			it++;
 			continue;
@@ -40,62 +100,89 @@ bool Minecraft::autoSelectVersion()
 		
 		it++;
 		
-		// skip invalid versions...
-		if(!selected_version.isValid())
+		if(cur_ver > loc_selected_version)
 		{
-			NBT_Debug("selected_version is invalid");
-			break;
+			loc_selected_version = cur_ver;
+			loc_selected_jarpath = jar_path;
 		}
-		
-		StatInfo si;
-		if(!IOAccess::Stat(ver_path, &si))
-		{
-			NBT_Debug("failed to stat %s", ver_path.c_str());
-			continue;
-		}
-		
-		if(!si.isFile())
-		{
-			NBT_Debug("%s is not a file", ver_path.c_str());
-			continue;
-		}
-		
-		NBT_Debug("selected version %s: %s", selected_version.str().c_str(), jar_path.c_str());
-	
-		return ver_path;
 	}
+	
+	return selectVersion(loc_selected_version, loc_selected_jarpath);
 }
 
-std::string Minecraft::locateJar()
+bool Minecraft::selectVersion(const MinecraftVersion& mcv)
 {
-	std::string jar_path = base_path;
+	// skip invalid versions...
+	if(!mcv.isValid())
+	{
+		NBT_Debug("version is invalid");
+		return false;
+	}
+	
+	VersionMap::iterator it = version_map_.find(mcv);
+	if(it == version_map_.end())
+	{
+		NBT_Debug("version not found in map");
+		return false;
+	}
+	
+	std::string &jar_path = it->second;
+	
+	return selectVersion(mcv, jar_path);
+}
+
+bool Minecraft::selectVersion(const MinecraftVersion& mcv, const std::string &jar_path)
+{
+	IOAccess::StatInfo si;
+	if(!IOAccess::Stat(jar_path, &si))
+	{
+		NBT_Debug("failed to stat %s", jar_path.c_str());
+		return false;
+	}
+	
+	if(!si.isFile())
+	{
+		NBT_Debug("%s is not a file", jar_path.c_str());
+		return false;
+	}
+	
+	NBT_Debug("selected version %s: %s", mcv.str().c_str(), jar_path.c_str());
+
+	selected_version = mcv;
+	selected_jar = jar_path;
+	
+	return true;
+}
+
+
+bool Minecraft::findVersions(const std::string &base)
+{
+	std::string jar_path = base;
 	std::string versions_path = jar_path + "/versions";
 	
 	if(!IOAccess::Exists(versions_path))
 	{
+		return false;
+		
 		// don't really need this, we really only support minecrafts
 		// with the versions folder... but what the heck.
 		
-		jar_path += "/minecraft.jar";
+		//jar_path += "/minecraft.jar";
 
-		if(IOAccess::Exists(jar_path))
-			return jar_path;
-		else
-			return nullptr;
+		//if(IOAccess::Exists(jar_path))
+		//	return true;
+		//else
+		//	return nullptr;
 	}
 	
-	Directory *dir = IOAccess::OpenDirectory(versions_dir);
+	IOAccess::Directory *dir = IOAccess::OpenDirectory(versions_path);
 	if(!dir)
-		return nullptr;
+		return false;
 	
 	std::string entry_name;
-	do
+	while(dir->read(&entry_name, false))
 	{
-		entry_name = dir->read();
-		if(!entry_name.length())
-			break;
-		
-		std::string entry_path = versions_dir + std::string("/") + entry_name;
+		std::string entry_path = versions_path + std::string("/") + entry_name;
 		
 		time_t releaseTime = 0;
 		struct tm tm;
@@ -105,18 +192,18 @@ std::string Minecraft::locateJar()
 		
 		rapidjson::Document *version_json = nullptr;
 		
-		StatInfo si;
+		IOAccess::StatInfo si;
 		if(!IOAccess::Stat(entry_path, &si))
 			continue;
 		
 		// ignore everything but listable directory entries
-		if(!si.isDirectory() || !si.isExecutable())
+		if(!si.isDir() || !si.isExecutable())
 			continue;
 		
 		std::string json_path = versions_path + std::string("/") +
 			entry_name + std::string("/") + entry_name + ".json";
 		
-		version_json = getJson(json_path);
+		version_json = LoadJson(json_path);
 		if(!version_json)
 			goto free_loop_data;
 		
@@ -146,24 +233,21 @@ std::string Minecraft::locateJar()
 		if(version_json)
 			delete version_json;
 	}
-	while(1);
 	
-	delete versions_dir;
-	
-	if(version_map.size() < 1)
+	if(version_map_.size() < 1)
 	{
 		NBT_Debug("failed to find any mc versions?");
 		goto err;
 	}
 	
-	std::sort(version_map.begin(), version_map.end());
-
-	err:
+	//std::sort(version_map_.begin(), version_map_.end());
+	return true;
 	
-	return nullptr;
+	err:
+		return false;
 }
 
-std::string Minecraft::locateData()
+std::string Minecraft::findBaseDir()
 {
 	std::string root_dir;
 	const char *data_root = nullptr;
@@ -188,4 +272,165 @@ std::string Minecraft::locateData()
 #endif
 	
 	return root_dir;
+}
+
+bool Minecraft::findSaves(const std::string &base)
+{
+	std::string saves_base = base;
+	if(!saves_base.length())
+		saves_base = base_path;
+	
+	IOAccess::StatInfo si;
+	if(!IOAccess::Stat(saves_base, &si))
+	{
+		NBT_Debug("failed to stat %s: %s", saves_base.c_str(), strerror(IOAccess::Errno()));
+		return false;
+	}
+	
+	if(!si.isDir())
+	{
+		NBT_Debug("%s is not a directory", saves_base.c_str());
+		return false;
+	}
+
+	std::string saves_path = saves_base + "/saves";
+
+	if(isSave(saves_base))
+	{
+		saves_.push_back(saves_base);
+		return true;
+	}
+	
+	if(IOAccess::Stat(saves_path, &si) && si.isDir())
+		saves_base = saves_path;
+	
+	IOAccess::Directory *dir = IOAccess::OpenDirectory(saves_base);
+	if(!dir)
+	{
+		NBT_Debug("failed to open directory %s: %s", saves_base.c_str(), strerror(IOAccess::Errno()));
+		return false;
+	}
+	
+	std::string ent;
+	while(dir->read(&ent, true))
+	{
+		if(isSave(ent))
+			saves_.push_back(ent);
+	}
+	
+	return saves_.size() != 0;
+}
+
+bool Minecraft::isSave(const std::string &path)
+{
+	IOAccess::StatInfo si;
+	if(!IOAccess::Stat(path, &si))
+		return false;
+	
+	// ignore everything but listable directory entries
+	if(!si.isDir() || !si.isExecutable())
+		return false;
+	
+	std::string level_dat_path = path + "/level.dat";
+	
+	// if level.dat does not exist or is not readable, skip
+	if(!IOAccess::Stat(level_dat_path, &si))
+		return false;
+	
+	if(!si.isFile() || !si.isReadable())
+		return false;
+	
+	return true;
+}
+
+rapidjson::Document *Minecraft::LoadJson(const std::string &p)
+{
+	std::string path = p;
+	rapidjson::Document *doc = nullptr;
+	char *buffer = nullptr;
+	
+	//NBT_Debug("attempting to fetch %s.json", path.c_str());
+	
+	// cache ftw
+	//auto it = jsonDocCache_.find(path);
+	//if(it != jsonDocCache_.end() && it->second)
+	//	return it->second;
+	
+	// path += ".json";
+	
+	IOAccess::File *fh = IOAccess::OpenFile(path, "r");
+	if(!fh)
+	{
+		NBT_Debug("failed to open json (%s): %s", path.c_str(), strerror(IOAccess::Errno()));
+		return nullptr;
+	}
+	
+	IOAccess::StatInfo si;
+	if(!IOAccess::Stat(path, &si))
+	{
+		NBT_Debug("failed to stat %s: %s", strerror(IOAccess::Errno()));
+		goto getJson_err;
+	}
+	
+	if(si.size < 1)
+	{
+		//NBT_Debug("json file is empty?");
+		goto getJson_err;
+	}
+	
+	buffer = (char *)malloc(si.size + 1);
+	if(!buffer)
+		goto getJson_err;
+	
+	memset(buffer, 0, si.size+1);
+	
+	if(fh->read(buffer, si.size) != si.size)
+	{
+		//NBT_Error("failed to read %i bytes from file", fsize);
+		goto getJson_err;
+	}
+	
+	doc = new rapidjson::Document;
+	
+	doc->Parse(buffer);
+	
+	if(doc->HasParseError())
+	{
+		const char *errstr = rapidjson::GetParseError_En(doc->GetParseError());
+		NBT_Error("error parsing json: %s", errstr);
+		
+		size_t err_off = doc->GetErrorOffset();
+		char err_buff[1024];
+		memset(err_buff, 0, sizeof(err_buff));
+		
+		const char *eoline = strchr(buffer+err_off, '\n');
+		if(!eoline)
+			eoline = buffer+si.size;
+		
+		size_t err_minsz = std::min((long)sizeof(err_buff)-1, eoline-buffer-1);
+		memcpy(err_buff, buffer+err_off, err_minsz);
+		
+		NBT_Error("at[%i]: %s", err_off, err_buff);
+		
+		goto getJson_err;
+	}
+	
+	//jsonDocCache_.emplace(path, doc);
+	
+	//NBT_Debug("got json!");
+	//return jsonDocCache_[path];
+	
+	return doc;
+	
+getJson_err:
+	if(doc)
+		delete doc;
+	
+	if(buffer)
+		free(buffer);
+
+	if(fh)
+		delete fh;
+	
+	return nullptr;
 }
