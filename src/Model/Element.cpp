@@ -63,6 +63,7 @@ bool Element::loadFaces(Variant *variant, rapidjson::Value &v)
 	if(rotation.shouldRotate())
 		rotate(); // rotates from/to coords.
 	
+	// TODO: think about moving this vertex building out of libmcmap
 	vertex_count = face_count * 6;
 	vertices = new CustomVertex[vertex_count];
 	vidx = 0;
