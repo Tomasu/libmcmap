@@ -124,7 +124,7 @@ namespace Model {
 
 	bool Variant::loadModel(const std::string &name)
 	{
-		rapidjson::Document *doc = Minecraft::LoadJson(std::string("assets/minecraft/models/block/") + name + ".json");
+		rapidjson::Document *doc = Minecraft::LoadJson(std::string("assets/minecraft/models/") + name + ".json");
 		if(!doc)
 		{
 			NBT_Debug("failed to get model json: %s", name.c_str());

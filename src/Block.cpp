@@ -7,7 +7,9 @@
 // ignores data parameter if a given block doesn't have any sub blocks
 const char *BlockName(uint32_t id, uint32_t data)
 {
-	static char buff[1024];
+	//static char buff[1024];
+	if(id == 0)
+		return "Air";
 	
 	if(subBlockRange[id].num)
 	{
@@ -21,6 +23,9 @@ const char *BlockName(uint32_t id, uint32_t data)
 
 const char *BlockStateName(uint32_t id, uint32_t d)
 {
+	if(id == 0)
+		return "air";
+	
 	if(subBlockRange[id].num)
 	{
 		return SubBlockStateNames[subBlockRange[id].start+d];

@@ -153,7 +153,7 @@ bool MCRegion::load()
 		z += this->z() * 32;
 		
 		Chunk *chunk = new Chunk(ts_header[i], 0xdeadbeef, 0xdeadbeef, offset, len);
-		//NBT_Debug("new chunk: i:%i offset:%i %i len:%i x:%i z:%i idx:%i", i, offset, chunk->offset(), len, x, z, x + z * 32);
+		NBT_Debug("new chunk: i:%i offset:%i %i len:%i x:%i z:%i idx:%i", i, offset, chunk->offset(), len, x, z, x + z * 32);
 		
 		if(!fh->seek(chunk->offset() * SECTOR_SIZE, SEEK_SET))
 		{

@@ -11,6 +11,9 @@ find_package(ZLIB REQUIRED)
 find_package(LibNBT REQUIRED)
 find_package(LibIOAccess REQUIRED)
 
+
+include_directories(${CMAKE_SOURCE_DIR}/vendor/rapidjson/include)
+
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
    add_definitions(-DDEBUG -O0 -ggdb3)
 else()
@@ -74,6 +77,7 @@ set(MCMAP_SOURCES
 	src/Block.cpp
 	src/BlockMaps.cpp
 	src/BlockState.cpp
+	src/BlockStateValue.cpp
 	src/Chunk.cpp
 	src/ChunkSection.cpp
 	src/Level.cpp
@@ -89,8 +93,13 @@ set(MCMAP_SOURCES
 	src/Model/Variant.cpp
 )
 
+set(LIBS ${ZLIB_LIBRARIES} ${LIBNBT_LIBRARIES} ${LIBIOACCESS_LIBRARIES})
+
 add_library(mcmap SHARED ${MCMAP_SOURCES} ${MCMAP_HEADERS})
-target_link_libraries(mcmap ${ZLIB_LIBRARIES} ${LIBNBT_LIBRARIES} ${LIBIOACCESS_LIBRARIES})
+add_dependencies(mcmap nbt ioaccess)
+target_link_libraries(mcmap ${LIBS})
+
+message(STATUS "libs: " ${LIBS})
 
 set_target_properties(mcmap PROPERTIES PUBLIC_HEADER "${MCMAP_HEADERS}")
 

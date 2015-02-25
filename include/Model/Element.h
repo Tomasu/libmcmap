@@ -16,7 +16,7 @@ namespace Model {
 struct Variant;
 
 struct Element {
-	private:
+	public:
 		struct UV_MAP
 		{
 			UV_MAP() : uv() { }
@@ -55,10 +55,6 @@ struct Element {
 		Rotation rotation;
 		bool shade;
 		Face faces[Face::MAX_FACES];
-		
-		uint32_t vertex_count;
-		uint32_t vidx;
-		CustomVertex *vertices;
 		
 		bool loadFaces(Variant *variant, rapidjson::Value &v);
 		bool load(Variant *variant, rapidjson::Value &v);

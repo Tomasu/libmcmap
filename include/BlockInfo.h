@@ -21,7 +21,7 @@ struct BlockInfo
 	
 	BlockAddress addr;
 	int32_t id, data, biome;
-	char *state_name;
+	const char *state_name;
 
 	static uint8_t SID(const uint8_t *data, uint32_t idx)
 	{

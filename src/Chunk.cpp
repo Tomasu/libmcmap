@@ -8,7 +8,8 @@
 #include "NBT.h"
 #include "NBT_Debug.h"
 #include "NBT_File.h"
-#include <NBT_Tag_Byte_Array.h>
+#include "NBT_Tag_Byte_Array.h"
+#include "NBT_Tag_List.h"
 
 #include "ChunkSection.h"
 #include "BlockAddress.h"
@@ -36,6 +37,8 @@ bool Chunk::load(NBT_File *fh)
 	uint8_t compression_type = 0;
 	
 	//NBT_Debug("begin");
+	
+	memset(sections, 0, sizeof(sections));
 	
 	if(!fh->read(&length))
 	{
@@ -67,6 +70,7 @@ bool Chunk::load(NBT_File *fh)
 	if(!nbt_data)
 	{
 		NBT_Error("failed to load root tag");
+		return false;
 	}
 	
 	if(!fh->endCompressedMode())
@@ -86,28 +90,32 @@ bool Chunk::load(NBT_File *fh)
 		
 		x_pos = level_tag->getInt("xPos");
 		z_pos = level_tag->getInt("zPos");
+		NBT_Debug("xpos: %i, zpos: %i", x_pos, z_pos);
 		
-		NBT_Tag_Compound *sections_tag = level_tag->getCompound("Sections");
+		NBT_Tag_List *sections_tag = level_tag->getList("Sections");
 		if(!sections_tag)
 		{
 			NBT_Error("chunk is missing Sections tag");
-			goto chunk_load_bail;
+			m_section_count = 0;
 		}
-		
-		m_section_count = sections_tag->count();
-		for(uint32_t section_id = 0; section_id < sections_tag->count(); section_id++)
+		else
 		{
-			NBT_Tag_Compound *section_tag = (NBT_Tag_Compound*)section_tag->childAt(section_id);
-			
-			ChunkSection *rcs = new ChunkSection();
-			if(!rcs->init(section_id, section_tag))
+			m_section_count = sections_tag->count();
+			NBT_Debug("sections: %i", m_section_count);
+			for(uint32_t section_id = 0; section_id < m_section_count; section_id++)
 			{
-				NBT_Debug("failed to initialize ChunkSection(%i)", section_id);
-				delete rcs;
-				goto chunk_load_bail;
+				NBT_Tag_Compound *section_tag = (NBT_Tag_Compound*)sections_tag->itemAt(section_id);
+				
+				ChunkSection *rcs = new ChunkSection();
+				if(!rcs->init(section_id, section_tag))
+				{
+					NBT_Debug("failed to initialize ChunkSection(%i)", section_id);
+					delete rcs;
+					goto chunk_load_bail;
+				}
+				
+				sections[rcs->y()] = rcs;
 			}
-			
-			sections[rcs->y()] = rcs;
 		}
 		
 		biome_data = nbt_data->getByteArray("Biomes");
@@ -119,10 +127,15 @@ bool Chunk::load(NBT_File *fh)
 	
 chunk_load_bail:
 	for(int i = 0; i < MAX_SECTIONS; i++)
+	{
 		delete sections[i];
+		sections[i] = nullptr;
+	}
 	
 	if(nbt_data)
 		delete nbt_data;
+	
+	nbt_data = nullptr;
 	
 	return false;
 }
@@ -177,11 +190,14 @@ ChunkSection* Chunk::getSection(uint32_t idx)
 
 bool Chunk::getBlockAddress(int32_t x, int32_t y, int32_t z, BlockAddress *addr)
 {
-	if((x / 16) != x_pos || (z_pos / 16) != z_pos)
+	/*if((x / 16) != x_pos || (z_pos / 16) != z_pos)
+	{
 		// not in this chunk.
+		NBT_Debug("addr: %i,%i :: %i,%i", x / 16, z / 16, x_pos, z_pos);
 		return false;
+	}*/
 	
-	*addr = BlockAddress(x, y, z);
+	*addr = BlockAddress(x_pos + x, y, z_pos + z);
 	
 	return true;
 }
@@ -192,6 +208,16 @@ bool Chunk::getBlockInfo(const BlockAddress &addr, BlockInfo *info)
 		return false;
 	
 	ChunkSection *section = sections[addr.section];
+	if(!section)
+	{
+		// a block in an empty section means its air. just short circuit.
+		info->addr = addr;
+		info->data = 0;
+		info->id = 0;
+		info->biome = BIOME_UNCALCULATED;
+		info->state_name = "air";
+		return true;
+	}
 	
 	bool ret = section->getBlockInfo(addr, info);
 	if(!ret)

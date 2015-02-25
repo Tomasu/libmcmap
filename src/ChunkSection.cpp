@@ -23,7 +23,7 @@ bool ChunkSection::init(int32_t idx, NBT_Tag_Compound *section)
 	block_add_nbt = nbt->getByteArray("Add");
 	if(!block_add_nbt)
 	{
-		NBT_Debug("missing Add data in section %i", idx);
+		//NBT_Debug("missing Add data in section %i", idx);
 	}
 	
 	block_data_nbt = nbt->getByteArray("Data");
@@ -44,6 +44,7 @@ bool ChunkSection::getBlockInfo(const BlockAddress &addr, BlockInfo *info) const
 	int32_t sid = BlockInfo::SID(sub_data, addr.idx);
 	
 	*info = BlockInfo(addr, bid, sid, BIOME_UNCALCULATED);
+	info->state_name = BlockStateName(bid, sid);
 	
 	return true;
 }

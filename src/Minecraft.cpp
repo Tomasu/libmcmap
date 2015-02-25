@@ -162,6 +162,7 @@ bool Minecraft::findVersions(const std::string &base)
 	
 	if(!IOAccess::Exists(versions_path))
 	{
+		NBT_Debug("%s does not exist :(", versions_path.c_str());
 		return false;
 		
 		// don't really need this, we really only support minecrafts
@@ -184,6 +185,8 @@ bool Minecraft::findVersions(const std::string &base)
 	{
 		std::string entry_path = versions_path + std::string("/") + entry_name;
 		
+		NBT_Debug("read: %s", entry_path.c_str());
+		
 		time_t releaseTime = 0;
 		struct tm tm;
 		rapidjson::Value releaseDateValue;
@@ -194,11 +197,17 @@ bool Minecraft::findVersions(const std::string &base)
 		
 		IOAccess::StatInfo si;
 		if(!IOAccess::Stat(entry_path, &si))
+		{
+			NBT_Debug("failed to stat %s", entry_path.c_str());
 			continue;
+		}
 		
 		// ignore everything but listable directory entries
 		if(!si.isDir() || !si.isExecutable())
+		{
+			NBT_Debug("%s not a directory (%i) or not executable (%i)", entry_path.c_str(), si.isDir(), si.isExecutable());
 			continue;
+		}
 		
 		std::string json_path = versions_path + std::string("/") +
 			entry_name + std::string("/") + entry_name + ".json";
@@ -384,7 +393,7 @@ rapidjson::Document *Minecraft::LoadJson(const std::string &p)
 	
 	memset(buffer, 0, si.size+1);
 	
-	if(fh->read(buffer, si.size) != si.size)
+	if(fh->read(buffer, si.size) != (size_t)si.size)
 	{
 		//NBT_Error("failed to read %i bytes from file", fsize);
 		goto getJson_err;
