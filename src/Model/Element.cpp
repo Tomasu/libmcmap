@@ -64,7 +64,7 @@ bool Element::loadFaces(Variant *variant, rapidjson::Value &v)
 		rotate(); // rotates from/to coords.
 	
 	vertex_count = face_count * 6;
-	vertices = new CUSTOM_VERTEX[vertex_count];
+	vertices = new CustomVertex[vertex_count];
 	vidx = 0;
 	
 	POINT_MAP pmap_ = POINT_MAP(from, to);
@@ -75,78 +75,78 @@ bool Element::loadFaces(Variant *variant, rapidjson::Value &v)
 	{
 		UV_MAP uv = UV_MAP(faces[Face::FACE_UP].uv);
 		
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.to3(), uv.p3());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.from4(), uv.p2());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.from3(), uv.p1());
+		vertices[vidx++] = CustomVertex(pmap_.to3(), uv.p3());
+		vertices[vidx++] = CustomVertex(pmap_.from4(), uv.p2());
+		vertices[vidx++] = CustomVertex(pmap_.from3(), uv.p1());
 		
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.to3(), uv.p3());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.to4(), uv.p4());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.from4(), uv.p2());
+		vertices[vidx++] = CustomVertex(pmap_.to3(), uv.p3());
+		vertices[vidx++] = CustomVertex(pmap_.to4(), uv.p4());
+		vertices[vidx++] = CustomVertex(pmap_.from4(), uv.p2());
 	}
 	
 	if(faces[Face::FACE_SOUTH].direction == Face::FACE_SOUTH)
 	{
 		UV_MAP uv = UV_MAP(faces[Face::FACE_SOUTH].uv);
 		
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.to2(), uv.p1());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.to4(), uv.p3());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.to1(), uv.p2());
+		vertices[vidx++] = CustomVertex(pmap_.to2(), uv.p1());
+		vertices[vidx++] = CustomVertex(pmap_.to4(), uv.p3());
+		vertices[vidx++] = CustomVertex(pmap_.to1(), uv.p2());
 		
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.to1(), uv.p2());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.to4(), uv.p3());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.to3(), uv.p4());
+		vertices[vidx++] = CustomVertex(pmap_.to1(), uv.p2());
+		vertices[vidx++] = CustomVertex(pmap_.to4(), uv.p3());
+		vertices[vidx++] = CustomVertex(pmap_.to3(), uv.p4());
 	}
 	
 	if(faces[Face::FACE_WEST].direction == Face::FACE_WEST)
 	{
 		UV_MAP uv = UV_MAP(faces[Face::FACE_WEST].uv);
 		
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.from2(), uv.p1());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.to4(), uv.p4());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.to2(), uv.p2());
+		vertices[vidx++] = CustomVertex(pmap_.from2(), uv.p1());
+		vertices[vidx++] = CustomVertex(pmap_.to4(), uv.p4());
+		vertices[vidx++] = CustomVertex(pmap_.to2(), uv.p2());
 		
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.from2(), uv.p1());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.from4(), uv.p3());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.to4(), uv.p4());
+		vertices[vidx++] = CustomVertex(pmap_.from2(), uv.p1());
+		vertices[vidx++] = CustomVertex(pmap_.from4(), uv.p3());
+		vertices[vidx++] = CustomVertex(pmap_.to4(), uv.p4());
 	}
 	
 	if(faces[Face::FACE_NORTH].direction == Face::FACE_NORTH)
 	{
 		UV_MAP uv = UV_MAP(faces[Face::FACE_NORTH].uv);
 		
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.from1(), uv.p1());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.from3(), uv.p3());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.from2(), uv.p2());
+		vertices[vidx++] = CustomVertex(pmap_.from1(), uv.p1());
+		vertices[vidx++] = CustomVertex(pmap_.from3(), uv.p3());
+		vertices[vidx++] = CustomVertex(pmap_.from2(), uv.p2());
 		
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.from2(), uv.p2());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.from3(), uv.p3());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.from4(), uv.p4());
+		vertices[vidx++] = CustomVertex(pmap_.from2(), uv.p2());
+		vertices[vidx++] = CustomVertex(pmap_.from3(), uv.p3());
+		vertices[vidx++] = CustomVertex(pmap_.from4(), uv.p4());
 	}
 	
 	if(faces[Face::FACE_EAST].direction == Face::FACE_EAST)
 	{
 		UV_MAP uv = UV_MAP(faces[Face::FACE_EAST].uv);
 		
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.from1(), uv.p2());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.to1(), uv.p1());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.from3(), uv.p4());
+		vertices[vidx++] = CustomVertex(pmap_.from1(), uv.p2());
+		vertices[vidx++] = CustomVertex(pmap_.to1(), uv.p1());
+		vertices[vidx++] = CustomVertex(pmap_.from3(), uv.p4());
 		
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.to1(), uv.p1());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.to3(), uv.p3());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.from3(), uv.p4());
+		vertices[vidx++] = CustomVertex(pmap_.to1(), uv.p1());
+		vertices[vidx++] = CustomVertex(pmap_.to3(), uv.p3());
+		vertices[vidx++] = CustomVertex(pmap_.from3(), uv.p4());
 	}
 	
 	if(faces[Face::FACE_DOWN].direction == Face::FACE_DOWN)
 	{
 		UV_MAP uv = UV_MAP(faces[Face::FACE_DOWN].uv);
 		
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.to1(), uv.p1());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.from1(), uv.p3());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.from2(), uv.p4());
+		vertices[vidx++] = CustomVertex(pmap_.to1(), uv.p1());
+		vertices[vidx++] = CustomVertex(pmap_.from1(), uv.p3());
+		vertices[vidx++] = CustomVertex(pmap_.from2(), uv.p4());
 		
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.to1(), uv.p1());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.from2(), uv.p4());
-		vertices[vidx++] = CUSTOM_VERTEX(pmap_.to2(), uv.p2());
+		vertices[vidx++] = CustomVertex(pmap_.to1(), uv.p1());
+		vertices[vidx++] = CustomVertex(pmap_.from2(), uv.p4());
+		vertices[vidx++] = CustomVertex(pmap_.to2(), uv.p2());
 	}
 	
 	NBT_Debug("wanted verts: %i, got %i", vertex_count, vidx);

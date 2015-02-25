@@ -215,7 +215,7 @@ namespace Model {
 		{
 			for(uint32_t i = 0; i < elem->vertex_count; i++)
 			{
-				CUSTOM_VERTEX &v = elem->vertices[i];
+				CustomVertex &v = elem->vertices[i];
 				al_transform_coordinates_3d(&rot, &(v.pos.f1), &(v.pos.f2), &(v.pos.f3));
 			}
 		}

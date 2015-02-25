@@ -30,14 +30,14 @@ struct Color
 	float r, g, b, a;
 };
 
-struct CUSTOM_VERTEX
+struct CustomVertex
 {
    VF3 pos;
 	VF2 txcoord;
 	float tx_page;
 	Color color;
 	
-	CUSTOM_VERTEX(float x, float y, float z, float u = 0.0, float v = 0.0, float txp = 0.0) :
+	CustomVertex(float x, float y, float z, float u = 0.0, float v = 0.0, float txp = 0.0) :
 		pos(x, y, z), txcoord(u, v), tx_page(txp)
 	{
 		// color = al_map_rgb(0, 0, 0); <-- can't be called till allegro is initialized...
@@ -48,7 +48,7 @@ struct CUSTOM_VERTEX
 		color.a = 1.0;
 	}
 	
-	CUSTOM_VERTEX(VF3 pos_ = VF3(), VF2 txc = VF2(), float txp = 0.0) :
+	CustomVertex(VF3 pos_ = VF3(), VF2 txc = VF2(), float txp = 0.0) :
 		pos(pos_), txcoord(txc), tx_page(txp)
 	{
 		// color = al_map_rgb(0, 0, 0); <-- can't be called till allegro is initialized...
@@ -59,7 +59,7 @@ struct CUSTOM_VERTEX
 		color.a = 0.0;
 	}
 	
-	CUSTOM_VERTEX(float x, float y, float z, float u, float v, Color c, float txp = 0) :
+	CustomVertex(float x, float y, float z, float u, float v, Color c, float txp = 0) :
 		pos(x, y, z), txcoord(u, v), tx_page(txp), color(c)
 	{ }
 };

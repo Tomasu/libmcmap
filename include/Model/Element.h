@@ -58,7 +58,7 @@ struct Element {
 		
 		uint32_t vertex_count;
 		uint32_t vidx;
-		CUSTOM_VERTEX *vertices;
+		CustomVertex *vertices;
 		
 		bool loadFaces(Variant *variant, rapidjson::Value &v);
 		bool load(Variant *variant, rapidjson::Value &v);

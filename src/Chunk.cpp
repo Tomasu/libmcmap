@@ -94,6 +94,7 @@ bool Chunk::load(NBT_File *fh)
 			goto chunk_load_bail;
 		}
 		
+		m_section_count = sections_tag->count();
 		for(uint32_t section_id = 0; section_id < sections_tag->count(); section_id++)
 		{
 			NBT_Tag_Compound *section_tag = (NBT_Tag_Compound*)section_tag->childAt(section_id);
@@ -158,6 +159,21 @@ bool Chunk::save(NBT_File *fh)
 	
 	return true;
 }
+
+uint32_t Chunk::sectionCount()
+{
+	return m_section_count;
+}
+
+ChunkSection* Chunk::getSection(uint32_t idx)
+{
+	if(idx >= m_section_count)
+		return nullptr;
+	
+	return sections[idx];
+}
+
+
 
 bool Chunk::getBlockAddress(int32_t x, int32_t y, int32_t z, BlockAddress *addr)
 {

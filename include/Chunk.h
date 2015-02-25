@@ -46,6 +46,9 @@ class Chunk
       bool getBlockAddress(int32_t x, int32_t y, int32_t z, BlockAddress *addr);
       bool getBlockInfo(const BlockAddress &addr, BlockInfo *info);
       
+		uint32_t sectionCount();
+		ChunkSection *getSection(uint32_t idx);
+		
 	private:
 		int x_pos;
 		int z_pos;
@@ -57,6 +60,7 @@ class Chunk
       NBT_Tag_Compound *nbt_data;
 		NBT_Tag_Byte_Array *biome_data;
 		
+		uint32_t m_section_count;
 		ChunkSection *sections[MAX_SECTIONS];
 };
 
