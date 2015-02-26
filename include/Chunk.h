@@ -29,8 +29,8 @@ class Chunk
 		bool load(NBT_File *fh);
 		bool save(NBT_File *buff);
 		
-		int x() { return x_pos; }
-		int z() { return z_pos; }
+		int32_t x() { return x_pos; }
+		int32_t z() { return z_pos; }
 		
 		void setTimestamp(uint32_t timestamp) { this->timestamp = timestamp; }
 		int getTimestamp() { return timestamp; }
@@ -50,9 +50,9 @@ class Chunk
 		ChunkSection *getSection(uint32_t idx);
 		
 	private:
-		int x_pos;
-		int z_pos;
-		int timestamp;
+		int32_t x_pos;
+		int32_t z_pos;
+		uint32_t timestamp;
 		
 		uint32_t chunk_offset;
 		uint32_t chunk_len;

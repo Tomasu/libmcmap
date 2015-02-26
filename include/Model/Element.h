@@ -60,6 +60,9 @@ struct Element {
 		bool load(Variant *variant, rapidjson::Value &v);
 		
 		void rotate();
+		
+		POINT_MAP pmap() { return POINT_MAP(from, to); }
+		UV_MAP uvmap(Face::FaceDirection dir) { return UV_MAP(faces[dir].uv); }
 };
 
 }

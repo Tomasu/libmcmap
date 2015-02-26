@@ -1,6 +1,9 @@
 #ifndef BLOCK_ADDRESS_H_GUARD
 #define BLOCK_ADDRESS_H_GUARD
 
+#include <stdio.h>
+#include <string>
+
 struct BlockAddress
 {
 	BlockAddress(int32_t dimid = 0, int32_t ax = 0, int32_t ay = 0, int32_t az = 0) : dimension(dimid), x(ax), y(ay), z(az)
@@ -80,6 +83,15 @@ struct BlockAddress
 	
 	// cache for chunk "Data" index
 	int32_t idx;
+	
+	const std::string toString()
+	{
+		char str[2048];
+		snprintf(str, 2047, "BlockAddress(%p: dim:%i x:%i y:%i z:%i lx:%i lz:%i section:%i ly:%i idx:%i)",
+			this, dimension, x, y, z, lx, lz, section, ly, idx
+		);
+		return str;
+	}
 };
 
 #endif /* BLOCK_ADDRESS_H_GUARD */

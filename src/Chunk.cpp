@@ -105,6 +105,11 @@ bool Chunk::load(NBT_File *fh)
 			for(uint32_t section_id = 0; section_id < m_section_count; section_id++)
 			{
 				NBT_Tag_Compound *section_tag = (NBT_Tag_Compound*)sections_tag->itemAt(section_id);
+				if(!section_tag)
+				{
+					NBT_Debug("section %i not found", section_id);
+					continue;
+				}
 				
 				ChunkSection *rcs = new ChunkSection();
 				if(!rcs->init(section_id, section_tag))
@@ -114,6 +119,7 @@ bool Chunk::load(NBT_File *fh)
 					goto chunk_load_bail;
 				}
 				
+				NBT_Debug("section[%i,%i]: %p", section_id, rcs->y(), rcs);
 				sections[rcs->y()] = rcs;
 			}
 		}
@@ -197,7 +203,7 @@ bool Chunk::getBlockAddress(int32_t x, int32_t y, int32_t z, BlockAddress *addr)
 		return false;
 	}*/
 	
-	*addr = BlockAddress(x_pos + x, y, z_pos + z);
+	*addr = BlockAddress(0, x, y, z);
 	
 	return true;
 }

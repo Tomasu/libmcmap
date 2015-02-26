@@ -110,6 +110,22 @@ bool Minecraft::autoSelectVersion()
 	return selectVersion(loc_selected_version, loc_selected_jarpath);
 }
 
+bool Minecraft::selectVersion(const std::string& sver)
+{
+	for(auto &mcv: version_map_)
+	{
+		if(mcv.first.str() == sver)
+		{
+			NBT_Debug("selected version %s: %s", mcv.first.str().c_str(), mcv.second.c_str());
+			selected_version = mcv.first;
+			selected_jar = mcv.second;
+			return true;
+		}
+	}
+	
+	return false;
+}
+
 bool Minecraft::selectVersion(const MinecraftVersion& mcv)
 {
 	// skip invalid versions...

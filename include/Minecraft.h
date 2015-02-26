@@ -64,6 +64,7 @@ class Minecraft
 		bool init(const std::string &path = "");
 		static Minecraft *Create(const std::string& path, const std::string& saves_path = "");
 		
+		bool selectVersion(const std::string &sver);
 		bool selectVersion(const MinecraftVersion &mcv);
 		bool autoSelectVersion();
 		
