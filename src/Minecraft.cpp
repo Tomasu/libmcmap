@@ -310,8 +310,10 @@ bool Minecraft::findVersions(const std::string &base)
 	//std::sort(version_map_.begin(), version_map_.end());
 	return true;
 
-	err:
-		return false;
+err:
+
+	return false;
+
 }
 
 std::string Minecraft::findBaseDir()

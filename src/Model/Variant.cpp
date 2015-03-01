@@ -8,6 +8,12 @@
 
 namespace Model {
 	
+	Variant::~Variant()
+	{
+		for(auto element: elements_)
+			delete element;
+	}
+
 	bool Variant::load(const std::string &k, rapidjson::Value &v)
 	{
 		if(v.IsNull() || !v.IsObject())

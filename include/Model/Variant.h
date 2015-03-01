@@ -13,6 +13,8 @@ namespace Model {
 	struct Variant
 	{
 		public:
+			~Variant();
+			
 			std::string key;
 			std::string model;
 			int x, y;

@@ -24,6 +24,11 @@ Level::~Level()
 	}
 
 	maps_.clear();
+	
+	for(auto &json: jsonDocCache_)
+	{
+		delete json.second;
+	}
 }
 
 bool Level::load(const std::string &path)
@@ -215,6 +220,8 @@ bool Level::dimensionScan(const std::string &path)
 					std::string level_name;
 
 					NBT *level_dat = find_level_dat(dp.path);
+
+					level_nbt = level_dat;
 
 					size_t dimpos = dp.path.find("DIM");
 					if(dimpos != std::string::npos)
