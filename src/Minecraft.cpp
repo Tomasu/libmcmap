@@ -204,16 +204,6 @@ bool Minecraft::findVersions(const std::string &base)
 	{
 		NBT_Debug("%s does not exist :(", versions_path.c_str());
 		return false;
-
-		// don't really need this, we really only support minecrafts
-		// with the versions folder... but what the heck.
-
-		//jar_path += "/minecraft.jar";
-
-		//if(IOAccess::Exists(jar_path))
-		//	return true;
-		//else
-		//	return nullptr;
 	}
 
 	IOAccess::Directory *dir = IOAccess::OpenDirectory(versions_path);
@@ -311,11 +301,13 @@ bool Minecraft::findVersions(const std::string &base)
 		goto err;
 	}
 
+	delete dir;
+	
 	//std::sort(version_map_.begin(), version_map_.end());
 	return true;
 
 err:
-
+	delete dir;
 	return false;
 
 }
@@ -493,6 +485,8 @@ rapidjson::Document *Minecraft::LoadJson(const std::string &p)
 	//NBT_Debug("got json!");
 	//return jsonDocCache_[path];
 
+	delete fh;
+	free(buffer);
 	return doc;
 
 getJson_err:
