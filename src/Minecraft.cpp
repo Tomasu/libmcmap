@@ -363,7 +363,7 @@ bool Minecraft::findSaves(const std::string &base)
 	if(isSave(saves_path))
 	{
 		NBT_Debug("isSave: %s", saves_path.c_str());
-		saves_.push_back(saves_base);
+		saves_.push_back(saves_path);
 		return true;
 	}
 
