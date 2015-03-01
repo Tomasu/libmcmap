@@ -15,24 +15,24 @@ Level::Level() : level_nbt(0) { }
 
 Level::~Level()
 {
-	delete level_nbt; 
+	delete level_nbt;
 	level_nbt = 0;
-	
+
 	for(auto &map: maps_)
 	{
 		delete map;
 	}
-	
+
 	maps_.clear();
 }
 
 bool Level::load(const std::string &path)
 {
 	path_ = path;
-	
+
 	if(!dimensionScan(path))
 		return false;
-	
+
 	for(auto &map: maps_)
 	{
 		if(!map->load())
@@ -40,7 +40,7 @@ bool Level::load(const std::string &path)
 			//NBT_Error("failed to load dimension at %s", map->mapPath().c_str());
 		}
 	}
-	
+
 	return true;
 }
 
@@ -51,7 +51,7 @@ Map *Level::getMap(int id)
 		if(map->dimension() == id)
 			return map;
 	}
-	
+
 	return nullptr;
 }
 
@@ -62,7 +62,7 @@ Map *Level::getMap(const std::string &name)
 		if(map->mapName() == name)
 			return map;
 	}
-	
+
 	return nullptr;
 }
 
@@ -78,7 +78,7 @@ struct DirPair
 NBT *find_level_dat(const std::string &path)
 {
 	NBT *nbt = 0;
-	
+
 	int i = 2;
 	size_t pos = path.size();
 	while(i--)
@@ -90,10 +90,10 @@ NBT *find_level_dat(const std::string &path)
 			//NBT_Debug("delim not found");
 			break;
 		}
-		
+
 		std::string level_dat_path = path.substr(0, pos+1) + "level.dat";
 		NBT_Debug("trying to load %s", level_dat_path.c_str());
-		
+
 		NBT *new_nbt = new NBT();
 		if(new_nbt->load(level_dat_path))
 		{
@@ -103,7 +103,7 @@ NBT *find_level_dat(const std::string &path)
 			break;
 		}
 	}
-	
+
 	return nbt;
 }
 
@@ -116,20 +116,20 @@ bool Level::dimensionScan(const std::string &path)
 		delete level_nbt;
 		return false;
 	}
-	
+
 	struct dirent *ent = 0;
 	std::vector<DirPair> dir_queue;
-	
+
 	// complicated shenanigans to locate all dimensions
 	// various server mods like bukkit don't agree on dimension locations
 	// instead of hardcoding support for layouts, just do a breadth first search
 	// for .mca files.
-	
+
 	DirPair dp("unk", path, dh);
 	bool load_players = false;
 	Map *curMap = 0;
 	std::string mapName;
-	
+
 	while(1)
 	{
 		ent = readdir(dp.dh);
@@ -141,7 +141,7 @@ bool Level::dimensionScan(const std::string &path)
 				dp = dir_queue.back();
 				dir_queue.pop_back();
 				ent = readdir(dp.dh);
-				
+
 				if(dp.name != "region")
 				{
 					curMap = 0;
@@ -154,34 +154,34 @@ bool Level::dimensionScan(const std::string &path)
 				// escape if the queue is empty
 				goto ESCAPE;
 		}
-		
+
 		// skip hidden files
 		if(ent->d_name[0] == '.')
 			continue;
-		
+
 		struct stat st;
-		
+
 		std::string fpath = dp.path;
 		fpath += "/";
 		fpath += ent->d_name;
-		
+
 		//NBT_Debug("scan: %s", fpath.c_str());
-		
+
 		if(stat(fpath.c_str(), &st) != 0)
 		{	// skip entries we can't stat
 			continue;
 		}
-		
+
 		if(S_ISDIR(st.st_mode))
 		{
 			DIR *sub_dh = opendir(fpath.c_str());
 			// skip if we can't list it
 			if(!sub_dh)
 				continue;
-			
+
 			if(strcasecmp(ent->d_name, "players") == 0)
 				load_players = true;
-			
+
 			dir_queue.push_back(dp);
 			dp.dh = sub_dh;
 			dp.path = fpath;
@@ -190,8 +190,8 @@ bool Level::dimensionScan(const std::string &path)
 		}
 		else
 		{
-			char *ext = rindex(ent->d_name, '.');
-			
+			char *ext = strrchr(ent->d_name, '.');
+
 			if(load_players)
 			{
 				if(ext && strcasecmp(ext, ".dat") == 0)
@@ -203,7 +203,7 @@ bool Level::dimensionScan(const std::string &path)
 						NBT_Error("failed to load player nbt data at %s", fpath.c_str());
 						continue;
 					}
-					
+
 					players_.push_back(player);
 				}
 			}
@@ -215,7 +215,7 @@ bool Level::dimensionScan(const std::string &path)
 					std::string level_name;
 
 					NBT *level_dat = find_level_dat(dp.path);
-					
+
 					size_t dimpos = dp.path.find("DIM");
 					if(dimpos != std::string::npos)
 					{
@@ -231,10 +231,10 @@ bool Level::dimensionScan(const std::string &path)
 							level_name = level_dat->getString("LevelName");
 						}
 					}
-					
+
 					Map *map = curMap = new Map(dp.path, level_name, level_dat);
 					maps_.push_back(map);
-					
+
 					dp = parent_dp;
 					dir_queue.pop_back();
 					continue;
@@ -248,7 +248,7 @@ bool Level::dimensionScan(const std::string &path)
 						//return false;
 						continue;
 					}
-					
+
 					mapName = level_nbt->getString("LevelName");
 					if(curMap)
 						curMap->setName(mapName);
@@ -257,9 +257,9 @@ bool Level::dimensionScan(const std::string &path)
 			}
 		}
 	}
-	
+
 ESCAPE:
-	
+
 	return true;
 }
 
@@ -271,13 +271,12 @@ std::string Level::levelName()
 std::vector<Player *> Level::dimensionPlayers(int32_t dim)
 {
 	std::vector<Player *> list;
-	
+
 	for(auto &player: players_)
 	{
 		if(player->dimension() == dim)
 			list.push_back(player);
 	}
-	
+
 	return list;
 }
-
