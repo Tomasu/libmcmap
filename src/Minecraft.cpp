@@ -27,12 +27,15 @@ namespace
 		using std::stoi;
 		NBT_Debug("Parse time! \"%s\"", time_str);
 		NBT_Debug("Cut example: %s", temp.substr(0, 4).data());
-		time_data.tm_year = 1900 - stoi(temp.substr(0, 4));
+		time_data.tm_year = stoi(temp.substr(0, 4)) - 1900;
 		time_data.tm_mon = stoi(temp.substr(5, 2)) - 1;
 		time_data.tm_mday = stoi(temp.substr(8, 2));
 		time_data.tm_hour = stoi(temp.substr(11, 2));
 		time_data.tm_min = stoi(temp.substr(14, 2));
 		time_data.tm_sec = stoi(temp.substr(17, 2));
+		time_data.tm_isdst = 0;
+		NBT_Debug("mktime output: %u", mktime(&time_data));
+		NBT_Debug("Year: %d, Mon: %d, MDay: %d, Hour: %d, Min: %d, Sec: %d, is_dst: %d", time_data.tm_year, time_data.tm_mon, time_data.tm_mday, time_data.tm_hour, time_data.tm_min, time_data.tm_sec, time_data.tm_isdst);
 	}
 }
 
@@ -285,6 +288,7 @@ bool Minecraft::findVersions(const std::string &base)
 		parseTime(releaseDateValue.GetString(), tm);
 
 		releaseTime = mktime(&tm);
+		NBT_Debug("Parsed timestamp: %u", releaseTime);
 
 		{
 			MinecraftVersion ver = MinecraftVersion(releaseIDValue.GetString(), releaseTime, strcmp(releaseTypeValue.GetString(), "snapshot")==0);
