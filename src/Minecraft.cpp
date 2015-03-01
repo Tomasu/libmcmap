@@ -360,8 +360,9 @@ bool Minecraft::findSaves(const std::string &base)
 
 	std::string saves_path = saves_base + "/saves";
 
-	if(isSave(saves_base))
+	if(isSave(saves_path))
 	{
+		NBT_Debug("isSave: %s", saves_path.c_str());
 		saves_.push_back(saves_base);
 		return true;
 	}
@@ -380,9 +381,13 @@ bool Minecraft::findSaves(const std::string &base)
 	while(dir->read(&ent, true))
 	{
 		if(isSave(ent))
+		{
+			NBT_Debug("isSave: %s", ent.c_str());
 			saves_.push_back(ent);
+		}
 	}
 
+	delete dir;
 	return saves_.size() != 0;
 }
 
@@ -404,6 +409,8 @@ bool Minecraft::isSave(const std::string &path)
 
 	if(!si.isFile() || !si.isReadable())
 		return false;
+	
+	NBT_Debug("IS SAVE: %s", path.c_str());
 
 	return true;
 }

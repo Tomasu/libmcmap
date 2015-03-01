@@ -5,8 +5,20 @@
 #include "NBT_Tag_Compound.h"
 #include "NBT_Tag_Byte_Array.h"
 
+ChunkSection::~ChunkSection()
+{
+	//NBT_Debug("delete ChunkSection");
+}
+
+ChunkSection::ChunkSection() : idx(-1), y_off(-1), block_ids_nbt(nullptr), block_add_nbt(nullptr), block_data_nbt(nullptr)
+{
+	//NBT_Debug("new ChunkSection");
+}
+
 bool ChunkSection::init(int32_t idx, NBT_Tag_Compound *section) 
 {
+	//NBT_Debug("begin: %i %p", idx, section);
+	
 	nbt = section;
 	
 	y_off = nbt->getByte("Y");

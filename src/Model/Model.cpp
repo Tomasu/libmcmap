@@ -64,6 +64,7 @@ namespace Model {
 		if(doc->HasParseError())
 		{
 			NBT_Debug("json parse error");
+			delete doc;
 			return false;
 		}
 		
@@ -71,6 +72,7 @@ namespace Model {
 		if(!variants.MemberCount())
 		{
 			NBT_Debug("no variants?");
+			delete doc;
 			return false;
 		}
 		
@@ -103,6 +105,7 @@ namespace Model {
 		
 		name_ = name;
 		
+		delete doc;
 		return true;
 	}
 

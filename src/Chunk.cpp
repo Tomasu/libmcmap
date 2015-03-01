@@ -19,20 +19,26 @@
 
 Chunk::Chunk(int t, int x, int z, int co, int cl) : x_pos(x), z_pos(z), timestamp(t), chunk_offset(co), chunk_len(cl), nbt_data(0)
 {
+	//NBT_Debug("new Chunk");
 	memset(sections, 0, sizeof(sections));
 }
 
 Chunk::~Chunk()
 {
-	 if(nbt_data)
-		  delete nbt_data;
+	//NBT_Debug("delete Chunk");
 
-	 nbt_data = 0;
+	for(auto sec: sections)
+		delete sec;
+	
+	delete nbt_data;
+	nbt_data = 0;
 }
 
 #define DEST_BUFFER_SIZE (SECTOR_SIZE * 8)
 bool Chunk::load(NBT_File *fh)
 {
+	//NBT_Debug("begin");
+	
 	uint32_t length = 0;
 	uint8_t compression_type = 0;
 	
@@ -90,7 +96,7 @@ bool Chunk::load(NBT_File *fh)
 		
 		x_pos = level_tag->getInt("xPos");
 		z_pos = level_tag->getInt("zPos");
-		NBT_Debug("xpos: %i, zpos: %i", x_pos, z_pos);
+		//NBT_Debug("xpos: %i, zpos: %i", x_pos, z_pos);
 		
 		NBT_Tag_List *sections_tag = level_tag->getList("Sections");
 		if(!sections_tag)
@@ -101,7 +107,7 @@ bool Chunk::load(NBT_File *fh)
 		else
 		{
 			m_section_count = sections_tag->count();
-			NBT_Debug("sections: %i", m_section_count);
+			//NBT_Debug("sections: %i", m_section_count);
 			for(uint32_t section_id = 0; section_id < m_section_count; section_id++)
 			{
 				NBT_Tag_Compound *section_tag = (NBT_Tag_Compound*)sections_tag->itemAt(section_id);
@@ -119,7 +125,7 @@ bool Chunk::load(NBT_File *fh)
 					goto chunk_load_bail;
 				}
 				
-				NBT_Debug("section[%i,%i]: %p", section_id, rcs->y(), rcs);
+				//NBT_Debug("section[%i,%i]: %p", section_id, rcs->y(), rcs);
 				sections[rcs->y()] = rcs;
 			}
 		}
@@ -143,6 +149,7 @@ chunk_load_bail:
 	
 	nbt_data = nullptr;
 	
+	//NBT_Debug("end err");
 	return false;
 }
 

@@ -13,7 +13,7 @@ class Map
 	public:
 		typedef std::unordered_map<typename MCRegion::Key, MCRegion *> RegionMap;
 		
-		Map(const std::string &path, const std::string &name, NBT *level_nbt);
+		Map(const std::string &path);
 		~Map();
 		
 		bool load();
@@ -35,17 +35,10 @@ class Map
 		
 		int32_t dimension() { return dimension_id; }
 		
-		void setName(const std::string &name) { map_name = name; }
-		
-		int32_t spawnX();
-		int32_t spawnZ();
-		int32_t spawnY();
-		
 	private:
 		const std::string map_path;
 		std::string map_name;
 		int32_t dimension_id;
-		NBT *level_nbt;
 		
 		RegionMap::iterator dataIterator_;
 		RegionMap data;

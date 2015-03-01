@@ -11,6 +11,8 @@
 #include "NBT.h"
 #include "NBT_Tag_Compound.h"
 
+#include <ioaccess/IOAccess.h>
+
 Level::Level() : level_nbt(0)
 {
 	NBT_Debug("new Level");
@@ -19,6 +21,10 @@ Level::Level() : level_nbt(0)
 Level::~Level()
 {
 	NBT_Debug("delete Level");
+	
+	if(level_nbt)
+		NBT_Debug("deleting level NBT");
+	
 	delete level_nbt;
 	level_nbt = 0;
 
@@ -41,9 +47,27 @@ bool Level::load(const std::string &path)
 {
 	NBT_Debug("begin");
 	
+	std::string level_dat_path = path + "/level.dat";
+	
+	IOAccess::StatInfo si;
+	if(!IOAccess::Stat(level_dat_path, &si))
+	{
+		NBT_Warn("No level.dat found, not a valid level!");
+		return false;
+	}
+	
+	NBT *nbt = new NBT;
+	if(!nbt->load(level_dat_path))
+	{
+		NBT_Error("failed to load level.dat!");
+		delete nbt;
+		return false;
+	}
+	
 	if(!dimensionScan(path))
 	{
 		NBT_Debug("failed dimension scan");
+		delete nbt;
 		return false;
 	}
 	
@@ -57,6 +81,8 @@ bool Level::load(const std::string &path)
 		}
 	}
 
+	level_nbt = nbt;
+	
 	NBT_Debug("end");
 	return true;
 }
@@ -86,59 +112,23 @@ Map *Level::getMap(const std::string &name)
 
 struct DirPair
 {
-	DirPair(const std::string &name, const std::string &path, DIR *dh) : name(name), path(path), dh(dh) { }
+	DirPair(const std::string &name, const std::string &path, IOAccess::Directory *dh) : name(name), path(path), dir(dh) { }
 	std::string name;
 	std::string path;
-	DIR *dh;
+	IOAccess::Directory *dir;
 };
-
-NBT *find_level_dat(const std::string &path)
-{
-	NBT_Debug("begin");
-	
-	NBT *nbt = 0;
-
-	int i = 2;
-	size_t pos = path.size();
-	//while(i--)
-	//{
-		pos = path.find_last_of("/\\", pos-1);
-		//NBT_Debug("pos:%i", pos);
-		if(pos == std::string::npos)
-		{
-			//NBT_Debug("delim not found");
-	//		break;
-		}
-
-		std::string level_dat_path = path.substr(0, pos+1) + "level.dat";
-		NBT_Debug("trying to load %s", level_dat_path.c_str());
-
-		NBT *new_nbt = new NBT();
-		if(new_nbt->load(level_dat_path))
-		{
-			NBT_Debug("OK!");
-			printf("dump:\n%s\n", new_nbt->serialize().c_str());
-			nbt = new_nbt;
-	//		break;
-		}
-	//}
-
-	return nbt;
-}
 
 bool Level::dimensionScan(const std::string &path)
 {
-	NBT_Debug("begin");
+	NBT_Debug("begin %s", path.c_str());
 	
-	DIR *dh = opendir(path.c_str());
-	if(!dh)
+	IOAccess::Directory *dir = IOAccess::OpenDirectory(path);
+	if(!dir)
 	{
 		NBT_Error("failed to open level directory for dimension scan.");
-		delete level_nbt;
 		return false;
 	}
 
-	struct dirent *ent = 0;
 	std::vector<DirPair> dir_queue;
 
 	// complicated shenanigans to locate all dimensions
@@ -146,30 +136,28 @@ bool Level::dimensionScan(const std::string &path)
 	// instead of hardcoding support for layouts, just do a breadth first search
 	// for .mca files.
 
-	DirPair dp("unk", path, dh);
+	DirPair dp("unk", path, dir);
 	bool load_players = false;
 	Map *curMap = 0;
 	std::string mapName;
 
 	while(1)
 	{
-		ent = readdir(dp.dh);
-		while(!ent)
+		
+		std::string ent;
+		// while the current dir list is at the end
+		while(!dp.dir->read(&ent))
 		{
 			if(!dir_queue.empty())
 			{
 				load_players = false;
+				delete dp.dir;
 				dp = dir_queue.back();
 				dir_queue.pop_back();
-				ent = readdir(dp.dh);
-
-				if(dp.name != "region")
-				{
-					curMap = 0;
-					delete level_nbt;
-					level_nbt = 0;
-				}
-				//NBT_Debug("back to %s", dp.path.c_str());
+				//continue;
+				//dp.dir->read(&ent);
+				if(!dp.dir->read(&ent))
+					break;
 			}
 			else
 				// escape if the queue is empty
@@ -177,47 +165,53 @@ bool Level::dimensionScan(const std::string &path)
 		}
 
 		// skip hidden files
-		if(ent->d_name[0] == '.')
+		if(ent[0] == '.')
 			continue;
-
-		struct stat st;
-
+		
 		std::string fpath = dp.path;
 		fpath += "/";
-		fpath += ent->d_name;
+		fpath += ent;
 
-		//NBT_Debug("scan: %s", fpath.c_str());
-
-		if(stat(fpath.c_str(), &st) != 0)
+		NBT_Debug("scan ent: %s", fpath.c_str());
+		
+		IOAccess::StatInfo si;
+		if(!IOAccess::Stat(fpath, &si))
 		{	// skip entries we can't stat
+			NBT_Debug("failed to stat %s", fpath.c_str());
 			continue;
 		}
 
-		if(S_ISDIR(st.st_mode))
+		if(si.isDir() && si.isExecutable())
 		{
-			DIR *sub_dh = opendir(fpath.c_str());
+			// is a directory, and is listable
+			
+			IOAccess::Directory *dir = IOAccess::OpenDirectory(fpath);
+		
 			// skip if we can't list it
-			if(!sub_dh)
+			if(!dir)
 				continue;
 
-			if(strcasecmp(ent->d_name, "players") == 0)
+			NBT_Debug("scan dir: %s", fpath.c_str());
+			if(strcasecmp(ent.c_str(), "players") == 0)
 				load_players = true;
 
 			dir_queue.push_back(dp);
-			dp.dh = sub_dh;
+			dp.dir = dir;
 			dp.path = fpath;
-			dp.name = ent->d_name;
+			dp.name = ent;
 			//NBT_Debug("entering %s", fpath.c_str());
 		}
 		else
 		{
-			char *ext = strrchr(ent->d_name, '.');
+			const char *ext = strrchr(ent.c_str(), '.');
 
+			NBT_Debug("scan: %s ext:%s", fpath.c_str(), ext);
 			if(load_players)
 			{
+				
 				if(ext && strcasecmp(ext, ".dat") == 0)
 				{
-					//NBT_Debug("found player at %s", fpath.c_str());
+					NBT_Debug("found player at %s", fpath.c_str());
 					Player *player = new Player(fpath);
 					if(!player->load())
 					{
@@ -232,50 +226,17 @@ bool Level::dimensionScan(const std::string &path)
 			{
 				if(ext && strcasecmp(ext, ".mca") == 0)
 				{
+					NBT_Debug("found region at %s", fpath.c_str());
+					
 					DirPair parent_dp = dir_queue.back();
-					std::string level_name;
 
-					NBT *level_dat = find_level_dat(dp.path);
-
-					//level_nbt = level_dat;
-
-					size_t dimpos = dp.path.find("DIM");
-					if(dimpos != std::string::npos)
-					{
-						size_t epos = dp.path.find_first_of("/\\", dimpos);
-						size_t spos = dp.path.find_last_of("/\\", dimpos);
-						level_name = dp.path.substr(spos+1, epos-spos-1);
-					}
-					else
-					{
-						level_name = dp.name;
-						if(level_dat)
-						{
-							level_name = level_dat->getString("LevelName");
-						}
-					}
-
-					Map *map = curMap = new Map(dp.path, level_name, level_dat);
+					Map *map = curMap = new Map(dp.path);
 					maps_.push_back(map);
 
+					delete dp.dir;
 					dp = parent_dp;
 					dir_queue.pop_back();
 					continue;
-				}
-				else if(!level_nbt && strcasecmp(ent->d_name, "level.dat") == 0)
-				{
-					/*level_nbt = new NBT();
-					if(!level_nbt->load(fpath))
-					{
-						//NBT_Error("failed to load level nbt data.");
-						//return false;
-						continue;
-					}
-
-					mapName = level_nbt->getString("LevelName");
-					if(curMap)
-						curMap->setName(mapName);
-					*/
 				}
 			}
 		}
@@ -283,6 +244,8 @@ bool Level::dimensionScan(const std::string &path)
 
 ESCAPE:
 	NBT_Debug("end");
+	//delete dp.dir;
+	delete dir;
 	return true;
 }
 
@@ -303,3 +266,8 @@ std::vector<Player *> Level::dimensionPlayers(int32_t dim)
 
 	return list;
 }
+
+int32_t Level::spawnX() { return level_nbt->getInt("SpawnX"); }
+int32_t Level::spawnY() { return level_nbt->getInt("SpawnY"); }
+int32_t Level::spawnZ() { return level_nbt->getInt("SpawnZ"); }
+		

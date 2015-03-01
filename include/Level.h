@@ -28,6 +28,10 @@ class Level
 		std::vector<Player *> &players() { return players_; }
 		std::vector<Player *> dimensionPlayers(int32_t dim);
 		
+		int32_t spawnX();
+		int32_t spawnY();
+		int32_t spawnZ();
+		
 		// TODO: add getBlockState, getBlockAddress, getBlockInfo, etc
 		//  probably move blockstate resolution/parsing to mcmap from mctools-viewer.
 		//  might even move all of the model loading, and geometry generation here too.

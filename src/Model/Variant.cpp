@@ -142,6 +142,7 @@ namespace Model {
 		if(doc->HasParseError())
 		{
 			NBT_Debug("json parse error?");
+			delete doc;
 			return false;
 		}
 		
@@ -155,6 +156,7 @@ namespace Model {
 				if(!loadElements(v->value))
 				{
 					NBT_Debug("failed to load elements :(");
+					delete doc;
 					return false;
 				}
 			}
@@ -163,6 +165,7 @@ namespace Model {
 				if(!loadTextures(v->value))
 				{
 					NBT_Debug("failed to load textures :(");
+					delete doc;
 					return false;
 				}
 			}
@@ -181,11 +184,13 @@ namespace Model {
 			if(!loadModel(parent_name))
 			{
 				NBT_Debug("failed to load parent %s", parent_name);
+				delete doc;
 				return false;
 			}
 			
 		}
 		
+		delete doc;
 		return true;
 	}
 

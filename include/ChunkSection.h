@@ -12,8 +12,8 @@ class NBT_Tag_Byte_Array;
 class ChunkSection
 {
 	public:
-		ChunkSection() : idx(-1), y_off(-1), block_ids_nbt(nullptr), block_add_nbt(nullptr), block_data_nbt(nullptr) { }
-		~ChunkSection() { }
+		ChunkSection();
+		~ChunkSection();
 		
 		bool init(int32_t id, NBT_Tag_Compound *section);
 		
