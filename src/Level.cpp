@@ -11,10 +11,14 @@
 #include "NBT.h"
 #include "NBT_Tag_Compound.h"
 
-Level::Level() : level_nbt(0) { }
+Level::Level() : level_nbt(0)
+{
+	NBT_Debug("new Level");
+}
 
 Level::~Level()
 {
+	NBT_Debug("delete Level");
 	delete level_nbt;
 	level_nbt = 0;
 
@@ -29,23 +33,31 @@ Level::~Level()
 	{
 		delete json.second;
 	}
+	
+	jsonDocCache_.clear();
 }
 
 bool Level::load(const std::string &path)
 {
-	path_ = path;
-
+	NBT_Debug("begin");
+	
 	if(!dimensionScan(path))
+	{
+		NBT_Debug("failed dimension scan");
 		return false;
-
+	}
+	
+	path_ = path;
+	
 	for(auto &map: maps_)
 	{
 		if(!map->load())
 		{
-			//NBT_Error("failed to load dimension at %s", map->mapPath().c_str());
+			NBT_Error("failed to load dimension at %s", map->mapPath().c_str());
 		}
 	}
 
+	NBT_Debug("end");
 	return true;
 }
 
@@ -82,18 +94,20 @@ struct DirPair
 
 NBT *find_level_dat(const std::string &path)
 {
+	NBT_Debug("begin");
+	
 	NBT *nbt = 0;
 
 	int i = 2;
 	size_t pos = path.size();
-	while(i--)
-	{
+	//while(i--)
+	//{
 		pos = path.find_last_of("/\\", pos-1);
 		//NBT_Debug("pos:%i", pos);
 		if(pos == std::string::npos)
 		{
 			//NBT_Debug("delim not found");
-			break;
+	//		break;
 		}
 
 		std::string level_dat_path = path.substr(0, pos+1) + "level.dat";
@@ -105,15 +119,17 @@ NBT *find_level_dat(const std::string &path)
 			NBT_Debug("OK!");
 			printf("dump:\n%s\n", new_nbt->serialize().c_str());
 			nbt = new_nbt;
-			break;
+	//		break;
 		}
-	}
+	//}
 
 	return nbt;
 }
 
 bool Level::dimensionScan(const std::string &path)
 {
+	NBT_Debug("begin");
+	
 	DIR *dh = opendir(path.c_str());
 	if(!dh)
 	{
@@ -221,7 +237,7 @@ bool Level::dimensionScan(const std::string &path)
 
 					NBT *level_dat = find_level_dat(dp.path);
 
-					level_nbt = level_dat;
+					//level_nbt = level_dat;
 
 					size_t dimpos = dp.path.find("DIM");
 					if(dimpos != std::string::npos)
@@ -266,7 +282,7 @@ bool Level::dimensionScan(const std::string &path)
 	}
 
 ESCAPE:
-
+	NBT_Debug("end");
 	return true;
 }
 

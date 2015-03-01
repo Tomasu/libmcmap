@@ -27,6 +27,7 @@ Map::Map(const std::string &path, const std::string &name, NBT *level_nbt) : map
 
 Map::~Map()
 {
+	NBT_Debug("delete Map");
    for(auto &region: data)
    {
       delete region.second;
@@ -61,7 +62,6 @@ bool Map::load()
 		ent_path.append(e->d_name);
 		
 		size_t pos = ent_path.rfind(".mca", std::string::npos);
-		NBT_Debug("ent_path: %s pos:%i", ent_path.c_str(), pos);
 		
 		if(pos == std::string::npos)
 			continue;
@@ -78,6 +78,7 @@ bool Map::load()
 	
 	closedir(save_dir);
 	
+	NBT_Debug("end");
 	return true;
 }
 
