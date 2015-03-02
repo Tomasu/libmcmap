@@ -156,12 +156,12 @@ bool Level::dimensionScan(const std::string &path)
 				dir_queue.pop_back();
 				//continue;
 				//dp.dir->read(&ent);
-				if(!dp.dir->read(&ent))
+				if(dp.dir->read(&ent))
 					break;
 			}
 			else
-				// escape if the queue is empty
-				goto ESCAPE;
+                            // escape if the queue is empty
+                            goto ESCAPE;
 		}
 
 		// skip hidden files
@@ -169,8 +169,12 @@ bool Level::dimensionScan(const std::string &path)
 			continue;
 		
 		std::string fpath = dp.path;
-		fpath += "/";
+                if (fpath.back() != '/' && fpath.back() != '\\')
+                    fpath += "/";
 		fpath += ent;
+                // TODO: Find the source of why the hell this is happening, because it shouldn't.
+                if (ent.size() == 0)
+                    continue;
 
 		NBT_Debug("scan ent: %s", fpath.c_str());
 		
@@ -203,7 +207,7 @@ bool Level::dimensionScan(const std::string &path)
 		}
 		else
 		{
-			const char *ext = strrchr(ent.c_str(), '.');
+			const char *ext = ent.c_str()+ent.find_last_of(".");
 
 			NBT_Debug("scan: %s ext:%s", fpath.c_str(), ext);
 			if(load_players)
