@@ -160,8 +160,8 @@ bool Level::dimensionScan(const std::string &path)
 					break;
 			}
 			else
-                            // escape if the queue is empty
-                            goto ESCAPE;
+				// escape if the queue is empty
+				goto ESCAPE;
 		}
 
 		// skip hidden files
@@ -169,12 +169,14 @@ bool Level::dimensionScan(const std::string &path)
 			continue;
 		
 		std::string fpath = dp.path;
-                if (fpath.back() != '/' && fpath.back() != '\\')
-                    fpath += "/";
+		if (fpath.back() != '/' && fpath.back() != '\\')
+			fpath += "/";
+		
 		fpath += ent;
-                // TODO: Find the source of why the hell this is happening, because it shouldn't.
-                if (ent.size() == 0)
-                    continue;
+		
+		// TODO: Find the source of why the hell this is happening, because it shouldn't.
+		if (ent.size() == 0)
+			continue;
 
 		NBT_Debug("scan ent: %s", fpath.c_str());
 		

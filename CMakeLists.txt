@@ -11,8 +11,15 @@ find_package(ZLIB REQUIRED)
 find_package(LibNBT REQUIRED)
 find_package(LibIOAccess REQUIRED)
 
+option(SHARED "Build shared library" ON)
+set(MODE SHARED)
 
 include_directories(${CMAKE_SOURCE_DIR}/vendor/rapidjson/include)
+
+if(NOT SHARED)
+	add_definitions(-static)
+	set(MODE STATIC)
+endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
    add_definitions(-DDEBUG -O0 -ggdb3)
@@ -95,8 +102,7 @@ set(MCMAP_SOURCES
 
 set(LIBS ${ZLIB_LIBRARIES} ${LIBNBT_LIBRARIES} ${LIBIOACCESS_LIBRARIES})
 
-add_library(mcmap SHARED ${MCMAP_SOURCES} ${MCMAP_HEADERS})
-add_dependencies(mcmap nbt ioaccess)
+add_library(mcmap ${MODE} ${MCMAP_SOURCES} ${MCMAP_HEADERS})
 target_link_libraries(mcmap ${LIBS})
 
 message(STATUS "libs: " ${LIBS})
@@ -143,6 +149,7 @@ install(TARGETS mcmap
 	EXPORT LibMCMapTargets
 	RUNTIME DESTINATION "${INSTALL_BIN_DIR}" COMPONENT bin
 	LIBRARY DESTINATION "${INSTALL_LIB_DIR}" COMPONENT shlib
+	ARCHIVE DESTINATION "${INSTALL_LIB_DIR}" COMPONENT lib
 	PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/libmcmap"
 	COMPONENT dev)
 
