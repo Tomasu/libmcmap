@@ -6,10 +6,10 @@
 
 struct BlockInfo
 {
-	BlockInfo() : addr(), id(BLOCK_AIR), data(0), biome(BIOME_UNCALCULATED) { }
+	BlockInfo() : addr(), id(BLOCK_AIR), data(0), biome(BIOME_UNCALCULATED), state_name("unk") { }
 	
 	BlockInfo(const BlockAddress &baddr, int32_t bid, int32_t bdata, int32_t b)
-		: addr(baddr), id(bid), data(bdata), biome(b) { }
+		: addr(baddr), id(bid), data(bdata), biome(b), state_name("unk") { }
 	
 	BlockInfo(const BlockInfo &b)
 	{
@@ -17,6 +17,7 @@ struct BlockInfo
 		id = b.id;
 		biome = b.biome;
 		data = b.data;
+		state_name = b.state_name;
 	}
 	
 	BlockAddress addr;

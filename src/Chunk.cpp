@@ -228,7 +228,7 @@ bool Chunk::getBlockInfo(const BlockAddress &addr, BlockInfo *info)
 		info->data = 0;
 		info->id = 0;
 		info->biome = BIOME_UNCALCULATED;
-		info->state_name = "air";
+		info->state_name = "air_nsec";
 		return true;
 	}
 	

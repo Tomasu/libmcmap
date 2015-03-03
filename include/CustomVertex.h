@@ -27,6 +27,8 @@ struct VI3 {
 
 struct Color
 {
+	Color() : r(0.0), g(0.0), b(0.0), a(0.0) { }
+	Color(float r_, float g_, float b_, float a_) : r(r_), g(g_), b(b_), a(a_) { }
 	float r, g, b, a;
 };
 
