@@ -4,7 +4,16 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include "rapidjson/document.h"
+
+//#include "rapidjson/document.h"
+
+namespace rapidjson {
+	class CrtAllocator;
+	template <typename BaseAllocator> class MemoryPoolAllocator;
+	template <typename Encoding, typename Allocator, typename StackAllocator> class GenericDocument;
+	template <typename CharType> struct UTF8;
+	typedef GenericDocument<UTF8<char>, MemoryPoolAllocator<CrtAllocator>, CrtAllocator > Document;
+}
 
 class NBT;
 class NBT_Tag_Compound;

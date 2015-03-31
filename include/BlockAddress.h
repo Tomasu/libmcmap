@@ -16,6 +16,7 @@ struct BlockAddress
 		if(lz < 0) lz += 16; // same as above
 		
 		ly = y & 15; // section local
+		if(ly < 0) ly += 16; // same as above
 		
 		section = y / 16;
 		

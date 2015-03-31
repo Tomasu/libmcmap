@@ -12,6 +12,7 @@
 #include "NBT_Tag_Compound.h"
 
 #include <ioaccess/IOAccess.h>
+#include "rapidjson/document.h"
 
 Level::Level() : level_nbt(0)
 {

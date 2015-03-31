@@ -341,6 +341,7 @@ std::string Minecraft::findBaseDir()
 
 bool Minecraft::findSaves(const std::string &base)
 {
+	NBT_Debug("findSaves begin");
 	std::string saves_base = base;
 	if(!saves_base.length())
 		saves_base = base_path;
