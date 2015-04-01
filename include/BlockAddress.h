@@ -10,13 +10,10 @@ struct BlockAddress
 	{
 		
 		lx = x & 15;
-		if(lx < 0) lx += 16; // if x is negative, add 16 to get non negative chunk local coords (0-15)
 		
 		lz = z & 15;
-		if(lz < 0) lz += 16; // same as above
-		
+	
 		ly = y & 15; // section local
-		if(ly < 0) ly += 16; // same as above
 		
 		section = y / 16;
 		
