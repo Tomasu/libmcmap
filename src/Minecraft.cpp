@@ -345,7 +345,7 @@ bool Minecraft::findSaves(const std::string &base)
 	std::string saves_base = base;
 	if(!saves_base.length())
 		saves_base = base_path;
-
+	
 	IOAccess::StatInfo si;
 	if(!IOAccess::Stat(saves_base, &si))
 	{
@@ -359,6 +359,7 @@ bool Minecraft::findSaves(const std::string &base)
 		return false;
 	}
 
+	// check base/saves before base for level.dat because we may have a spurious level.dat in "saves_base".
 	std::string saves_path = saves_base + "/saves";
 
 	if(isSave(saves_path))
@@ -368,6 +369,13 @@ bool Minecraft::findSaves(const std::string &base)
 		return true;
 	}
 
+	if(isSave(saves_base))
+	{
+		NBT_Debug("isSave: %s", saves_base.c_str());
+		saves_.push_back(saves_base);
+		return true;
+	}
+	
 	if(IOAccess::Stat(saves_path, &si) && si.isDir())
 		saves_base = saves_path;
 
