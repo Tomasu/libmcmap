@@ -56,7 +56,7 @@ bool ChunkSection::getBlockInfo(const BlockAddress &addr, BlockInfo *info) const
 	int32_t sid = BlockInfo::SID(sub_data, addr.idx);
 	
 	*info = BlockInfo(addr, bid, sid, BIOME_UNCALCULATED);
+	BlockIsValid(bid, sid); // funny we don't actually care if this returns false. rename perhaps?
 	info->state_name = BlockStateName(bid, sid);
-	
 	return true;
 }

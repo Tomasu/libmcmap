@@ -24,7 +24,7 @@ endif()
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
    add_definitions(-DDEBUG -O0 -ggdb3)
 else()
-   add_definitions(-O2 -s -march=native)
+   add_definitions(-DDEBUG -O2 -s -march=native)
 endif()
 
 add_definitions(-fPIC -Wextra -Wall -pipe -std=gnu++11)

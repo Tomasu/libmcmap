@@ -91,6 +91,7 @@ bool Chunk::load(NBT_File *fh)
 		if(!level_tag)
 		{
 			NBT_Error("chunk is missing Level tag");
+			NBT_Debug("data: %s", nbt_data->serialize().c_str());
 			goto chunk_load_bail;
 		}
 		

@@ -5,6 +5,7 @@
 
 const char *BlockName(uint32_t id, uint32_t data = 0);
 const char *BlockStateName(uint32_t id, uint32_t data = 0);
+bool BlockIsValid(uint32_t id, uint32_t data);
 
 enum BiomeID {
 	BIOME_UNKNOWN = -2,

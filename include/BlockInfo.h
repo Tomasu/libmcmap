@@ -29,11 +29,11 @@ struct BlockInfo
 		return Nibble4(data, idx);
 	}
 	
-	static uint32_t ID(const uint8_t *data, const uint8_t *add, uint32_t idx)
+	static uint32_t ID(const uint8_t *data, const uint8_t */*add*/, uint32_t idx)
 	{
 		uint32_t blkid_a = data[idx];
-		uint32_t blkid_b = Nibble4(add, idx);
-		uint32_t blkid = blkid_a + (blkid_b << 8);
+		//uint32_t blkid_b = Nibble4(add, idx);
+		uint32_t blkid = blkid_a;// + (blkid_b << 8);
 		
 		return blkid;
 	}
